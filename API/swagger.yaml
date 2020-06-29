@@ -1,0 +1,123 @@
+openapi: 3.0.3
+info:
+  title: Yournal API
+  description: Documentation and definition of the Yournal API
+  version: 0.1.0
+  contact:
+    name: Patrick Röthlisberger
+    email: hi@pat.dev
+    url: https://pat.dev
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: '{protocol}://api.example.com/v1'
+    description: Main API endpoint
+    variables:
+      protocol:
+        enum:
+          - http
+          - https
+        default: https
+
+paths:
+  /users:
+    post:
+      summary: Register a user with oAuth2
+      description: Register a new user with oAuth2 and user choosen username
+      tags:
+        - User
+      operationId: CreateUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewUserRequest"
+        description: oAuth2 token as well as a user choosen username
+        required: true
+      responses:
+        "201":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "422":
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericErrorSchema"
+    get:
+      summary: Get current user
+      description: Gets the currently logged-in user
+      tags:
+        - User
+      security:
+        - Token: [] # TODO: Authentification
+      operationId: GetCurrentUser
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "401":
+          description: Unauthorized
+        "422":
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericErrorSchema"
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        email:
+          type: string
+          description: User email
+        token: # TODO: Authentification
+          type: string
+          description: 'TODO: Replace with oAuth2'
+        username:
+          type: string
+          description: User chosen username
+        image:
+          type: string
+          description: User chosen profileimage
+      required:
+        - email
+        - token # TODO: Authentification
+        - username
+        - image
+    UserResponse:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+      required:
+        - user
+    NewUser:
+      type: object
+      description: Allow user to choose his own username
+      properties:
+        username:
+          type: string
+        token: # TODO: Authentification
+          type: string
+      required:
+        - username
+        - token # TODO: Authentification
+    NewUserRequest:
+      type: object
+      description: Allow user to choose his own username
+      properties:
+        user:
+          $ref: "#/components/schemas/NewUser"
+      required:
+        - user

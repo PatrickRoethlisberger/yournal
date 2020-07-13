@@ -12,7 +12,7 @@ info:
     url: https://opensource.org/licenses/MIT
 
 servers:
-  - url: '{protocol}://api.example.com/v1'
+  - url: '{protocol}://api.yournal.tk/v1'
     description: Main API endpoint
     variables:
       protocol:

@@ -124,17 +124,20 @@ components:
       name: Authorization
       in: header
   schemas:
+    oAuthType:
+      type: string
+      enum: [Apple, Google, Microsoft]
+      default: Google
     oAuthUser:
       type: object
       properties:
         code:
           type: string
-        type:
-          type: string
-          enum: [Apple, Google, Microsoft]
+        oAuthType:
+          $ref: "#/components/schemas/oAuthType"
       required:
-        - email
-        - password
+        - code
+        - type
     oAuthUserRequest:
       type: object
       properties:
@@ -147,10 +150,13 @@ components:
       properties:
         email:
           type: string
-          description: User email
-        token: # TODO: Authentification
+          description: User email provided by oAuth Provider
+        oAuthType:
+          $ref: "#/components/schemas/oAuthType"
+          description: oAuth type chosen by user
+        oAuthID:
           type: string
-          description: 'TODO: Replace with oAuth2'
+          description: oAuth ID provided by oAuth Provider
         username:
           type: string
           description: User chosen username
@@ -159,8 +165,8 @@ components:
           description: User chosen profileimage
       required:
         - email
-        - token # TODO: Authentification
-        - username
+        - oAuthType
+        - oAuthID
     UserResponse:
       type: object
       properties:
@@ -171,8 +177,6 @@ components:
     UpdateUser:
       type: object
       properties:
-        email:
-          type: string
         username:
           type: string
         image:

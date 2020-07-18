@@ -341,7 +341,6 @@ components:
       required:
         - slug
         - title
-        - coverImage
         - body
         - createdAt
         - updatedAt

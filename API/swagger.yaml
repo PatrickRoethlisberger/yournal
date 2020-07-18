@@ -4,9 +4,9 @@ info:
   description: Documentation and definition of the Yournal API
   version: 0.1.0
   contact:
-    name: Patrick Röthlisberger
-    email: hi@pat.dev
-    url: https://pat.dev
+    name: Marc Bannier, Patrick Röthlisberger
+    email: hi@yournal.tk
+    url: https://yournal.tk
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT

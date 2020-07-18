@@ -12,14 +12,8 @@ info:
     url: https://opensource.org/licenses/MIT
 
 servers:
-  - url: '{protocol}://api.yournal.tk/v1'
+  - url: 'https://api.yournal.tk/v1'
     description: Main API endpoint
-    variables:
-      protocol:
-        enum:
-          - http
-          - https
-        default: https
 
 paths:
   /users/login:

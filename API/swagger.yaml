@@ -16,10 +16,10 @@ servers:
     description: Main API endpoint
 
 paths:
-  /users/login:
+  /users/auth:
     post:
-      summary: oAuth2 Authentification endpoint
-      description: oAuth2 Authentication endpoint for registration or login
+      summary: User Authentification endpoint
+      description: oAuth2 Authentication endpoint for registration or login of users
       tags:
         - User
       operationId: oAuth2

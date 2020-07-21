@@ -16,7 +16,7 @@ servers:
     description: Main API endpoint
 
 paths:
-  /users/auth:
+  /auth:
     post:
       summary: User Authentification endpoint
       description: oAuth2 Authentication endpoint for registration or login of users
@@ -256,19 +256,23 @@ components:
       name: Authorization
       in: header
   schemas:
-    oAuthType:
+    clientID:
       type: string
       enum: [Apple, Google, Microsoft]
     oAuthUser:
       type: object
       properties:
-        code:
+        grant_type:
+          description: set default to client_credentials for oAuth-Login
           type: string
-        oAuthType:
-          $ref: "#/components/schemas/oAuthType"
+        client_secret:
+          type: string
+        client_id:
+          $ref: "#/components/schemas/clientID"
       required:
-        - code
-        - type
+        - grant_type
+        - client_secret
+        - client_id
     oAuthUserRequest:
       type: object
       properties:

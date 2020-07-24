@@ -36,11 +36,11 @@ paths:
               schema:
                 $ref: "#/components/schemas/GenericErrorSchema"
     post:
-      summary: User Authentification endpoint
-      description: oAuth2 Authentication endpoint for registration or login of users
+      summary: Post User Authentication Code
+      description: Post user Authentication Code after sucessful oAuth Authentication
       tags:
-        - User
-      operationId: oAuth2
+        - Auth
+      operationId: PostAuthCode
       requestBody:
         content:
           application/json:

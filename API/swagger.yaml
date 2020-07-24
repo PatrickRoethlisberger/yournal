@@ -274,30 +274,52 @@ components:
       name: Authorization
       in: header
   schemas:
-    clientID:
+    oAuthMethod:
+      type: object
+      properties:
+        oAuthName:
+          type: string
+        oAuthLink:
+          description: Link to oAuth Provider with allready set paraneters and correct callback URL
+          type: string
+        oAuthLogo:
+          type: string
+        oAuthColor:
+          type: string
+      required:
+        - oAuthName
+        - oAuthLink
+        - oAuthLogo
+        - oAuthColor
+    oAuthMethodResponse:
+      type: object
+      properties:
+        oAuthMethods:
+          type: array
+          items:
+            $ref: "#/components/schemas/oAuthMethod"
+        oAuthMethodCount:
+          type: integer
+    oAuthType:
       type: string
       enum: [Apple, Google, Microsoft]
     oAuthUser:
       type: object
       properties:
-        grant_type:
-          description: set default to client_credentials for oAuth-Login
+        code:
           type: string
-        client_secret:
-          type: string
-        client_id:
-          $ref: "#/components/schemas/clientID"
+        oAuthType:
+          $ref: "#/components/schemas/oAuthType"
       required:
-        - grant_type
-        - client_secret
-        - client_id
+        - code
+        - oAuthType
     oAuthUserRequest:
       type: object
       properties:
-        user:
+        oAuthUser:
           $ref: "#/components/schemas/oAuthUser"
       required:
-        - user
+        - oAuthUser
     User:
       type: object
       properties:

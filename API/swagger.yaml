@@ -17,6 +17,24 @@ servers:
 
 paths:
   /auth:
+    get:
+      summary: Get possible authentification methods
+      tags:
+        - Auth
+      operationId: GetAuthMethods
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/oAuthMethodResponse"
+        "422":
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericErrorSchema"
     post:
       summary: User Authentification endpoint
       description: oAuth2 Authentication endpoint for registration or login of users

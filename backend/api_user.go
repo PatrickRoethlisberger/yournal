@@ -11,22 +11,79 @@
 package main
 
 import (
+	"errors"
+	"fmt"
 	"net/http"
 
+	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 )
 
 // GetCurrentUser - Get current user
 func GetCurrentUser(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{})
-}
 
-// OAuth2 - User Authentification endpoint
-func OAuth2(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{})
+	tokenClaims := jwt.ExtractClaims(c)
+	oAuthID := tokenClaims["id"].(string)
+
+	var username, email, image, oAuthType, err = GetUserInformation(oAuthID)
+	if err != nil {
+		fmt.Println(errors.New("Failed to get User properties"))
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"email":     email,
+		"oAuthType": oAuthType,
+		"oAuthID":   oAuthID,
+		"username":  username,
+		"image":     image,
+	})
 }
 
 // UpdateCurrentUser - Update current user
 func UpdateCurrentUser(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{})
+	type Input struct {
+		Username string `json:"username"`
+		Image    string `json:"image"`
+	}
+	var input Input
+	tokenClaims := jwt.ExtractClaims(c)
+	oAuthID := tokenClaims["id"].(string)
+	if err := c.ShouldBindJSON(&input); err != nil {
+		fmt.Println(err)
+	}
+	db = CreateDBConnection()
+	defer db.Close()
+	if input.Username == "" {
+		fmt.Println(errors.New("Username empty"))
+	} else {
+		stmtUserUpdate, err := db.Prepare("update user set username = ? where oAuthID = ?")
+		if err != nil {
+			fmt.Println(errors.New("Failed to attach new username"))
+		}
+		_, err = stmtUserUpdate.Exec(input.Username, oAuthID)
+		if err != nil {
+			fmt.Println(errors.New("Failed to attach new username"))
+		}
+	}
+	if input.Image == "" {
+		fmt.Println(errors.New("image empty"))
+	} else {
+		stmtUserUpdate, err := db.Prepare("update user set image = ? where oAuthID = ?")
+		if err != nil {
+			fmt.Println(errors.New("Failed to attach new image"))
+		}
+		_, err = stmtUserUpdate.Exec(input.Image, oAuthID)
+		if err != nil {
+			fmt.Println(errors.New("Failed to create new image"))
+		}
+	}
+	var username, email, image, oAuthType, err = GetUserInformation(oAuthID)
+	if err != nil {
+		fmt.Println(errors.New("Failed to get User properties"))
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"email":     email,
+		"oAuthType": oAuthType,
+		"oAuthID":   oAuthID,
+		"username":  username,
+		"image":     image})
 }

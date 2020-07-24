@@ -14,23 +14,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/maxzerbini/oauth"
 )
-
-// Route is the information for every URI.
-type Route struct {
-	// Name is the name of this Route.
-	Name string
-	// Method is the string for the HTTP method. ex) GET, POST etc..
-	Method string
-	// Pattern is the pattern of the URI.
-	Pattern string
-	// HandlerFunc is the handler function of this route.
-	HandlerFunc gin.HandlerFunc
-}
-
-// Routes is the list of the generated Route.
-type Routes []Route
 
 // NewRouter returns a new router.
 func NewRouter() *gin.Engine {
@@ -38,7 +22,9 @@ func NewRouter() *gin.Engine {
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
 	router.GET("/", Index)
-	registerAPI(router)
+	router.POST("/auth", authMiddleware.LoginHandler)
+	router.GET("/auth", ChoseAuthProvider)
+	router.GET("/auth/refresh_token", authMiddleware.RefreshHandler)
 
 	return router
 }
@@ -46,7 +32,7 @@ func NewRouter() *gin.Engine {
 //NewRouterGroup returns a Router Group for authenticated access
 func NewRouterGroup(router *gin.Engine, path string) *gin.RouterGroup {
 	group := router.Group(path)
-	group.Use(oauth.Authorize(secret, nil))
+	group.Use(authMiddleware.MiddlewareFunc())
 	{
 		for _, route := range routes {
 			switch route.Method {
@@ -67,47 +53,4 @@ func NewRouterGroup(router *gin.Engine, path string) *gin.RouterGroup {
 // Index is the index handler.
 func Index(c *gin.Context) {
 	c.String(http.StatusOK, "Hello World!")
-}
-
-var routes = Routes{
-	{
-		"DeletePost",
-		http.MethodDelete,
-		"/posts/:slug",
-		DeletePost,
-	},
-
-	{
-		"GetPost",
-		http.MethodGet,
-		"/posts/:slug",
-		GetPost,
-	},
-
-	{
-		"GetPosts",
-		http.MethodGet,
-		"/posts",
-		GetPosts,
-	},
-
-	{
-		"UpdatePost",
-		http.MethodPut,
-		"/posts/:slug",
-		UpdatePost,
-	},
-
-	{
-		"GetCurrentUser",
-		http.MethodGet,
-		"/users",
-		GetCurrentUser,
-	},
-	{
-		"UpdateCurrentUser",
-		http.MethodPut,
-		"/users",
-		UpdateCurrentUser,
-	},
 }

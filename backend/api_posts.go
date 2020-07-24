@@ -11,33 +11,95 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
+	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 )
 
 // DeletePost - Delete a post
 func DeletePost(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{})
+	tokenClaims := jwt.ExtractClaims(c)
+	oAuthID := tokenClaims["id"].(string)
+	slug := c.Param("slug")
+	db := CreateDBConnection()
+	defer db.Close()
+	stmtDelPost, err := db.Prepare("Delete from post where oAuthID = ? and post.slug = ?")
+	if err != nil {
+		fmt.Println(err)
+	}
+	_, err = stmtDelPost.Exec(oAuthID, slug)
+	if err != nil {
+		fmt.Println(err)
+	}
+	c.String(http.StatusOK, "OK")
 }
 
 // GetPost - Get a post
 func GetPost(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{})
+	tokenClaims := jwt.ExtractClaims(c)
+	oAuthID := tokenClaims["id"].(string)
+	slug := c.Param("slug")
+	var title, coverImage, body, oAuthType, updatedAt, createdAt, email, username, image string
+	var public bool
+	db := CreateDBConnection()
+	defer db.Close()
+	stmtPostOut, err := db.Prepare("Select post.title, post.coverImage, post.body, post.createdAt,post.updatedAt, post.public, user.email, user.oAuthType, user.Username, user.Image from post join user on user.oAuthID = post.oAuthID where user.oAuthID = ? and post.slug = ?")
+	if err != nil {
+		fmt.Println(err)
+	}
+	stmtPostOut.QueryRow(oAuthID, slug).Scan(&title, &coverImage, &body, &createdAt, &updatedAt, &public, &email, &oAuthType, &username, &image)
+	if title == "" {
+		c.JSON(422, gin.H{"errors": "Post not found"})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"slug":       slug,
+			"title":      title,
+			"coverImage": coverImage,
+			"body":       body,
+			"createdAt":  createdAt,
+			"updatedAt":  updatedAt,
+			"public":     public,
+			"author": gin.H{
+				"email":     email,
+				"oAuthType": oAuthType,
+				"oAuthID":   oAuthID,
+				"username":  username,
+				"image":     image,
+			}})
+	}
 }
 
 // GetPosts - Get posts
 func GetPosts(c *gin.Context) {
-	//claims := jwt.ExtractClaims(c)
-	//user, _ := c.Get(identityKey)
+	tokenClaims := jwt.ExtractClaims(c)
+	oAuthID := tokenClaims["id"].(string)
+	//var slug, title, coverImage, body, oAuthType, updatedAt, createdAt, email, username, image string
+	//var public bool
+	var posts = []Post{}
+	db := CreateDBConnection()
+	defer db.Close()
+	stmtPostsOut, err := db.Prepare("Select post.slug, post.title, post.coverImage, post.body, post.createdAt,post.updatedAt, post.public, user.oAuthID, user.email, user.oAuthType, user.Username, user.Image from post join user on user.oAuthID = post.oAuthID where user.oAuthID = ?")
+	if err != nil {
+		fmt.Println(err)
+	}
+	rows, _ := stmtPostsOut.Query(oAuthID)
+	var rowCount int = 0
+	for rows.Next() {
+		var post Post
+		err = rows.Scan(&post.Slug, &post.Title, &post.CoverImage, &post.Body, &post.CreatedAt, &post.UpdatedAt, &post.Public, &post.Author.OAuthID, &post.Author.EMail, &post.Author.OAuthType, &post.Author.Username, &post.Author.Image)
+		if err != nil {
+			fmt.Println(err)
+		}
+		posts = append(posts, post)
+		rowCount++
+	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"slug":       "teststring",
-		"title":      "Dies ist ein Testeintrag",
-		"coverImage": "https://source.unsplash.com/random",
-		"body":       "Dieser Beispieltext soll das JSON testen",
-		"createdAt":  "2020-07-20 16:35",
-		"updatedAt":  "2020-07-20 17:00",
-		"author":     "Marc Bannier"})
+		"posts":     posts,
+		"postCount": rowCount,
+	})
 }
 
 // UpdatePost - Update a post

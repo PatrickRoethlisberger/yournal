@@ -120,8 +120,10 @@ paths:
   /posts:
     get:
       summary: Get posts
-      description: Get posts from latest to oldest. Username is
-       required an shall be equal to logged in user.
+      description: Get posts from latest to oldest. Only public posts
+       or Posts made by the logged in user will be returned. It's possible
+       to filter by posts made by an specific user with the secified URL
+       parameter.
       tags:
         - Posts
       security:
@@ -380,6 +382,9 @@ components:
         updatedAt:
           type: string
           format: date-time
+        isPrivate:
+          type: boolean
+          default: true
         author:
           $ref: "#/components/schemas/User"
       required:

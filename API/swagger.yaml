@@ -422,10 +422,14 @@ components:
           type: string
         body:
           type: string
+        isPrivate:
+          type: boolean
+          default: true
       required:
         - title
         - description
         - body
+        - isPrivate
     NewPostRequest:
       type: object
       properties:
@@ -442,6 +446,8 @@ components:
           type: string
         body:
           type: string
+        isPrivate:
+          type: boolean
     UpdatePostRequest:
       type: object
       properties:

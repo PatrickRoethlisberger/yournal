@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"time"
 
 	jwt "github.com/appleboy/gin-jwt/v2"
@@ -20,7 +22,7 @@ var (
 )
 var authMiddleware, err = jwt.New(&jwt.GinJWTMiddleware{
 	Realm:       "Yournal",
-	Key:         []byte("secret key"),
+	Key:         []byte(secret),
 	Timeout:     time.Hour,
 	MaxRefresh:  time.Hour,
 	IdentityKey: identityKey,
@@ -39,52 +41,49 @@ var authMiddleware, err = jwt.New(&jwt.GinJWTMiddleware{
 		}
 	},
 	Authenticator: func(c *gin.Context) (interface{}, error) {
-		/*	content, err := GoogleGetUserInfo(c.Query("state"), c.Query("code"))
-			if err != nil {
-				fmt.Println(err.Error())
-			}
-			fmt.Println(c.Query("state"))
-			fmt.Println(c.Query("code"))
-			var userdata UserData
-			if err := json.Unmarshal(content, &userdata); err != nil {
-				fmt.Println(err)
-			}
-			var oAuthType string
-			var oAuthID string
-			db = CreateDBConnection()
-			defer db.Close()
+		content, err := GoogleGetUserInfo(c.Query("state"), c.Query("code"))
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+		var userdata UserData
+		if err := json.Unmarshal(content, &userdata); err != nil {
+			fmt.Println(err)
+		}
+		var oAuthType string
+		var oAuthID string
+		db = CreateDBConnection()
+		defer db.Close()
 
-			stmtUserOut, err := db.Prepare("Select oAuthType, oAuthID from user where oAuthID = ?")
+		stmtUserOut, err := db.Prepare("Select oAuthType, oAuthID from user where oAuthID = ?")
+		if err != nil {
+			return nil, jwt.ErrFailedAuthentication
+		}
+		stmtUserOut.QueryRow(userdata.ID).Scan(&oAuthType, &oAuthID)
+		if oAuthType == "" {
+			stmtUserCreate, err := db.Prepare("Insert into user (oAuthID, email, oAuthType, image) VALUES (?,?)")
 			if err != nil {
 				return nil, jwt.ErrFailedAuthentication
 			}
-			stmtUserOut.QueryRow(userdata.ID).Scan(&oAuthType, &oAuthID)
-			if oAuthType == "" {
-				stmtUserCreate, err := db.Prepare("Insert into user (oAuthID, email, oAuthType, image) VALUES (?,?)")
-				if err != nil {
-					return nil, jwt.ErrFailedAuthentication
-				}
-				_, err = stmtUserCreate.Exec(userdata.ID, userdata.Email, c.Query("oAuthType"), userdata.Picture)
-				if err != nil {
-					return nil, jwt.ErrFailedAuthentication
-				}
-				return &Benutzer{
-					UserID: userdata.ID,
-					Email:  userdata.Email,
-				}, nil
-			} else if c.Query("oAuthType") == oAuthType && userdata.ID == oAuthID {
-				return &Benutzer{
-					UserID: userdata.ID,
-					Email:  userdata.Email,
-				}, nil
+			_, err = stmtUserCreate.Exec(userdata.ID, userdata.Email, c.Query("oAuthType"), userdata.Picture)
+			if err != nil {
+				return nil, jwt.ErrFailedAuthentication
 			}
-			return nil, jwt.ErrFailedAuthentication
-		*/
+			return &Benutzer{
+				UserID: userdata.ID,
+				Email:  userdata.Email,
+			}, nil
+		} else if c.Query("oAuthType") == oAuthType && userdata.ID == oAuthID {
+			return &Benutzer{
+				UserID: userdata.ID,
+				Email:  userdata.Email,
+			}, nil
+		}
+		return nil, jwt.ErrFailedAuthentication
 
-		return &Benutzer{
+		/*return &Benutzer{
 			UserID: "107966950747087456973",
 			Email:  "marc.bannier@student.ibz.ch",
-		}, nil
+		}, nil*/
 	},
 	Authorizator: func(data interface{}, c *gin.Context) bool {
 		db = CreateDBConnection()
@@ -98,7 +97,6 @@ var authMiddleware, err = jwt.New(&jwt.GinJWTMiddleware{
 		if oAuthID == data.(*Benutzer).UserID {
 			return true
 		}
-
 		return false
 	},
 	Unauthorized: func(c *gin.Context, code int, message string) {

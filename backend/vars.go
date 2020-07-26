@@ -3,10 +3,18 @@ package main
 import (
 	"database/sql"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/oauth2"
 )
+
+//Query Type defines the input variables for a GET-Query on posts
+type Query struct {
+	author string `query:"author"`
+	limit  string `query:"limit"`
+	offset string `query:"offset"`
+}
 
 //Route Type for defining different API-Routes
 type Route struct {
@@ -20,6 +28,14 @@ type Route struct {
 	HandlerFunc gin.HandlerFunc
 }
 
+//PostInput defines the Type of a Input for Update / Create Post
+type PostInput struct {
+	Title      string `json:"title"`
+	CoverImage string `json:"coverImage"`
+	Body       string `json:"body"`
+	IsPrivate  bool   `json:"isPrivate"`
+}
+
 //Post defines a struct of Items in a Post
 type Post struct {
 	Slug string `json:"slug"`
@@ -30,11 +46,11 @@ type Post struct {
 
 	Body string `json:"body"`
 
-	CreatedAt string `json:"createdAt"`
+	CreatedAt time.Time `json:"createdAt"`
 
-	UpdatedAt string `json:"updatedAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 
-	Public string `json:"public"`
+	IsPrivate string `json:"isPrivate"`
 
 	Author User `json:"author"`
 }
@@ -57,10 +73,6 @@ type User struct {
 	Image string `json:"image,omitempty"`
 }
 
-// TestUserVerifier provides user credentials verifier for testing.
-type TestUserVerifier struct {
-}
-
 // Routes is the list of the generated Route.
 type Routes []Route
 
@@ -78,8 +90,7 @@ var (
 	//GoogleOauthConfig defines the configuration for Google Authentication
 	GoogleOauthConfig *oauth2.Config
 	db                *sql.DB
-	clientsecret      string
-	tokenid           string
+	errFeedback       []string
 )
 
 var routes = Routes{
@@ -122,5 +133,11 @@ var routes = Routes{
 		http.MethodPut,
 		"/users",
 		UpdateCurrentUser,
+	},
+	{
+		"CreatePost",
+		http.MethodPost,
+		"/posts",
+		CreatePost,
 	},
 }

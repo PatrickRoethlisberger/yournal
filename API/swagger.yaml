@@ -7,9 +7,6 @@ info:
     name: Marc Bannier, Patrick Röthlisberger
     email: hi@yournal.tk
     url: https://yournal.tk
-  license:
-    name: MIT
-    url: https://opensource.org/licenses/MIT
 
 servers:
   - url: 'https://api.yournal.tk/v1'

@@ -308,11 +308,14 @@ components:
     oAuthUser:
       type: object
       properties:
+        state:
+          type: string
         code:
           type: string
         oAuthType:
           $ref: "#/components/schemas/oAuthType"
       required:
+        - state
         - code
         - oAuthType
     oAuthUserRequest:

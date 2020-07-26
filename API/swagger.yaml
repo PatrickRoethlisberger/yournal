@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Yournal API
   description: Documentation and definition of the Yournal API
-  version: 0.1.0
+  version: 1.0.0
   contact:
     name: Marc Bannier, Patrick Röthlisberger
     email: hi@yournal.tk

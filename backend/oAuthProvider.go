@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/oauth2"
@@ -14,8 +15,8 @@ import (
 func ChoseAuthProvider(c *gin.Context) {
 	GoogleOauthConfig = &oauth2.Config{
 		RedirectURL:  "http://localhost:8080/auth",
-		ClientID:     "326772098844-0lioass0eklv0rlp6994t8vg27l9gqai.apps.googleusercontent.com",
-		ClientSecret: "Trw1GWYXpjreSdgq3YTQMSyP",
+		ClientID:     os.Getenv("google_id"),
+		ClientSecret: os.Getenv("google_pw"),
 		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email"},
 		Endpoint:     google.Endpoint,
 	}

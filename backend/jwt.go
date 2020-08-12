@@ -17,8 +17,7 @@ type Benutzer struct {
 
 var identityKey = "id"
 var (
-	// TODO: randomize it
-	oauthStateString = "pseudo-random"
+	oauthStateString = String(10)
 )
 var authMiddleware, err = jwt.New(&jwt.GinJWTMiddleware{
 	Realm:       "Yournal",

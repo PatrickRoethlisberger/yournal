@@ -31,6 +31,7 @@ type Route struct {
 //PostInput defines the Type of a Input for Update / Create Post
 type PostInput struct {
 	Title      string `json:"title"`
+	Category   string `json:"category"`
 	CoverImage string `json:"coverImage"`
 	Body       string `json:"body"`
 	IsPrivate  bool   `json:"isPrivate"`
@@ -41,6 +42,8 @@ type Post struct {
 	Slug string `json:"slug"`
 
 	Title string `json:"title"`
+
+	Category string `json:"category"`
 
 	CoverImage string `json:"coverImage"`
 

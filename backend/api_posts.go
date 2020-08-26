@@ -151,7 +151,7 @@ func UpdatePost(c *gin.Context) {
 		if err != nil {
 			errFeedback = append(errFeedback, err.Error())
 		}
-		_, err = stmtPostUpdate.Exec(input.category, slug, oAuthID)
+		_, err = stmtPostUpdate.Exec(input.Category, slug, oAuthID)
 		if err != nil {
 			errFeedback = append(errFeedback, err.Error())
 		}

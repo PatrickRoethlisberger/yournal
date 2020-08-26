@@ -11,6 +11,7 @@ const charset = "abcdefghijklmnopqrstuvwxyz" +
 var seededRand *rand.Rand = rand.New(
 	rand.NewSource(time.Now().UnixNano()))
 
+//StringWithCharset returns String with given Charset
 func StringWithCharset(length int, charset string) string {
 	b := make([]byte, length)
 	for i := range b {
@@ -19,6 +20,7 @@ func StringWithCharset(length int, charset string) string {
 	return string(b)
 }
 
+//String gives out random String with given length
 func String(length int) string {
 	return StringWithCharset(length, charset)
 }

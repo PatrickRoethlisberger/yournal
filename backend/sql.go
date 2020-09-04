@@ -8,24 +8,27 @@ import (
 )
 
 //CreateDBConnection creates a connection to the mysql Database
-func CreateDBConnection() *sql.DB {
+func CreateDBConnection() (*sql.DB, error) {
 	db, err := sql.Open("mysql", "yournal:hIYzQPTNysFTIuCb@/yournal?parseTime=true")
 	if err != nil {
-		panic(err.Error()) // Just for example purpose. You should use proper error handling instead of panic
+		return nil, err
 	}
 
 	// Open doesn't open a connection. Validate DSN data:
 	err = db.Ping()
 	if err != nil {
-		panic(err.Error()) // proper error handling instead of panic in your app
+		return nil, err
 	}
-	return db
+	return db, nil
 }
 
 //GetUserInformation gets the userinformation for the current User from DB
 func GetUserInformation(oAuthID string) (user User, err error) {
 	//var username, email, image, oAuthType string = "", "", "", ""
-	db := CreateDBConnection()
+	db, err := CreateDBConnection()
+	if err != nil {
+		return user, errors.New("Failed to get Database connection")
+	}
 	defer db.Close()
 	stmtUserOut, err := db.Prepare("Select oAuthID, oAuthType, username, email, image from user where oAuthID = ?")
 	if err != nil {

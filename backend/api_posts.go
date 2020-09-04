@@ -8,13 +8,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// DeletePost - Delete a post
+// DeletePost deletes a post on a given slug
 func DeletePost(c *gin.Context) {
 	tokenClaims := jwt.ExtractClaims(c)
 	oAuthID := tokenClaims["id"].(string)
 	slug := c.Param("slug")
 	errFeedback = nil
-	db := CreateDBConnection()
+	db, err := CreateDBConnection()
+	if err != nil {
+		errFeedback = append(errFeedback, err.Error())
+	}
 	defer db.Close()
 	stmtDelPost, err := db.Prepare("Delete from post where oAuthID = ? and post.slug = ?")
 	if err != nil {
@@ -33,20 +36,23 @@ func DeletePost(c *gin.Context) {
 	}
 }
 
-// GetPost - Get a post
+// GetPost gets a single Post by given slug
 func GetPost(c *gin.Context) {
 	tokenClaims := jwt.ExtractClaims(c)
 	oAuthID := tokenClaims["id"].(string)
 	slug := c.Param("slug")
 	var post = Post{}
 	errFeedback = nil
-	db := CreateDBConnection()
-	defer db.Close()
-	stmtPostsOut, err := db.Prepare("Select post.slug, category.name, post.title, post.coverImage, post.body, post.createdAt,post.updatedAt, post.isprivate, user.oAuthID, user.email, user.oAuthType, user.Username, user.Image from post join user on user.oAuthID = post.oAuthID join category on category.id = post.category where user.oAuthID = ? and post.slug = ?")
+	db, err := CreateDBConnection()
 	if err != nil {
 		errFeedback = append(errFeedback, err.Error())
 	}
-	stmtPostsOut.QueryRow(oAuthID, slug).Scan(&post.Slug, &post.Category, &post.Title, &post.CoverImage, &post.Body, &post.CreatedAt, &post.UpdatedAt, &post.IsPrivate, &post.Author.OAuthID, &post.Author.EMail, &post.Author.OAuthType, &post.Author.Username, &post.Author.Image)
+	defer db.Close()
+	stmtPostsOut, err := db.Prepare("Select post.slug, category.name, post.title, post.coverImage, post.body, post.createdAt, post.updatedAt, post.pubDate, post.isprivate, user.oAuthID, user.email, user.oAuthType, user.Username, user.Image from post join user on user.oAuthID = post.oAuthID join category on category.slug = post.category where user.oAuthID = ? and post.slug = ?")
+	if err != nil {
+		errFeedback = append(errFeedback, err.Error())
+	}
+	stmtPostsOut.QueryRow(oAuthID, slug).Scan(&post.Slug, &post.Category, &post.Title, &post.CoverImage, &post.Body, &post.CreatedAt, &post.UpdatedAt, &post.PubDate, &post.IsPrivate, &post.Author.OAuthID, &post.Author.EMail, &post.Author.OAuthType, &post.Author.Username, &post.Author.Image)
 
 	if post.Title == "" {
 		errFeedback = append(errFeedback, "Post not found")
@@ -62,7 +68,7 @@ func GetPost(c *gin.Context) {
 	}
 }
 
-// GetPosts - Get posts
+// GetPosts function gets all posts on a given filter
 func GetPosts(c *gin.Context) {
 	tokenClaims := jwt.ExtractClaims(c)
 	oAuthID := tokenClaims["id"].(string)
@@ -72,6 +78,8 @@ func GetPosts(c *gin.Context) {
 	query.limit, _ = c.GetQuery("limit")
 	query.author, _ = c.GetQuery("author")
 	query.offset, _ = c.GetQuery("offset")
+	query.PubDate, _ = c.GetQuery("pubDate")
+	query.category, _ = c.GetQuery("category")
 	if query.limit == "" {
 		query.limit = "15"
 	}
@@ -86,15 +94,24 @@ func GetPosts(c *gin.Context) {
 		if query.author == user.Username {
 			whereClause = "where user.username ='" + query.author + "'"
 		} else {
-			whereClause = "where user.username ='" + query.author + "' and post.isPrivate = 0"
+			whereClause = "where (user.username ='" + query.author + "' and post.isPrivate = 0)"
 		}
 	} else {
-		whereClause = "where user.oAuthID ='" + oAuthID + "' or post.isPrivate = 0"
+		whereClause = "where (user.oAuthID ='" + oAuthID + "' or post.isPrivate = 0)"
+	}
+	if query.PubDate != "" {
+		whereClause += " and post.pubDate = '" + query.PubDate + "'"
+	}
+	if query.category != "" {
+		whereClause += " and category.name = '" + query.category + "'"
 	}
 	var posts = []Post{}
-	db := CreateDBConnection()
+	db, err := CreateDBConnection()
+	if err != nil {
+		errFeedback = append(errFeedback, err.Error())
+	}
 	defer db.Close()
-	stmtPostsOut, err := db.Prepare("Select post.slug, post.title, category.name, post.coverImage, post.body, post.createdAt,post.updatedAt, post.isPrivate, user.oAuthID, user.email, user.oAuthType, user.Username, user.Image from post join user on user.oAuthID = post.oAuthID join category on category.id = post.category " + whereClause + " order by post.updatedAt desc limit ? Offset ?")
+	stmtPostsOut, err := db.Prepare("Select post.slug, post.title, category.name, post.coverImage, post.body, post.createdAt,post.updatedAt, post.pubDate, post.isPrivate, user.oAuthID, user.email, user.oAuthType, user.Username, user.Image from post join user on user.oAuthID = post.oAuthID join category on category.slug = post.category " + whereClause + " order by post.updatedAt desc limit ? Offset ?")
 	if err != nil {
 		errFeedback = append(errFeedback, err.Error())
 	}
@@ -105,7 +122,7 @@ func GetPosts(c *gin.Context) {
 	var rowCount int = 0
 	for rows.Next() {
 		var post Post
-		err = rows.Scan(&post.Slug, &post.Title, &post.Category, &post.CoverImage, &post.Body, &post.CreatedAt, &post.UpdatedAt, &post.IsPrivate, &post.Author.OAuthID, &post.Author.EMail, &post.Author.OAuthType, &post.Author.Username, &post.Author.Image)
+		err = rows.Scan(&post.Slug, &post.Title, &post.Category, &post.CoverImage, &post.Body, &post.CreatedAt, &post.UpdatedAt, &post.PubDate, &post.IsPrivate, &post.Author.OAuthID, &post.Author.EMail, &post.Author.OAuthType, &post.Author.Username, &post.Author.Image)
 		if err != nil {
 			errFeedback = append(errFeedback, err.Error())
 		}
@@ -124,13 +141,16 @@ func GetPosts(c *gin.Context) {
 	}
 }
 
-// UpdatePost - Update a post
+// UpdatePost updates a post by a given slug
 func UpdatePost(c *gin.Context) {
 	tokenClaims := jwt.ExtractClaims(c)
 	oAuthID := tokenClaims["id"].(string)
 	slug := c.Param("slug")
 	errFeedback = nil
-	db := CreateDBConnection()
+	db, err := CreateDBConnection()
+	if err != nil {
+		errFeedback = append(errFeedback, err.Error())
+	}
 	defer db.Close()
 	var input PostInput
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -162,6 +182,16 @@ func UpdatePost(c *gin.Context) {
 			errFeedback = append(errFeedback, err.Error())
 		}
 		_, err = stmtPostUpdate.Exec(input.CoverImage, slug, oAuthID)
+		if err != nil {
+			errFeedback = append(errFeedback, err.Error())
+		}
+	}
+	if input.PubDate != "" {
+		stmtPostUpdate, err := db.Prepare("update post set pubDate = ? where slug = ? and oAuthID = ?")
+		if err != nil {
+			errFeedback = append(errFeedback, err.Error())
+		}
+		_, err = stmtPostUpdate.Exec(input.PubDate, slug, oAuthID)
 		if err != nil {
 			errFeedback = append(errFeedback, err.Error())
 		}
@@ -209,24 +239,27 @@ func CreatePost(c *gin.Context) {
 	tokenClaims := jwt.ExtractClaims(c)
 	oAuthID := tokenClaims["id"].(string)
 	errFeedback = nil
-	db := CreateDBConnection()
+	db, err := CreateDBConnection()
+	if err != nil {
+		errFeedback = append(errFeedback, err.Error())
+	}
 	defer db.Close()
 	var input PostInput
 	if err := c.ShouldBindJSON(&input); err != nil {
 		errFeedback = append(errFeedback, err.Error())
 	}
 	createdAt := time.Now()
-	stmtPostCreate, err := db.Prepare("Insert into post (title,category,coverImage,body,oAuthID,createdAt,updatedAt,isPrivate) Values (?,(Select id from category where name = ?),?,?,?,?,?,?)")
-	_, err = stmtPostCreate.Exec(input.Title, input.Category, input.CoverImage, input.Body, oAuthID, createdAt, createdAt, input.IsPrivate)
+	stmtPostCreate, err := db.Prepare("Insert into post (title,category,coverImage,body,oAuthID,createdAt,updatedAt,pubDate,isPrivate) Values (?,(Select id from category where name = ?),?,?,?,?,?,?,?)")
+	_, err = stmtPostCreate.Exec(input.Title, input.Category, input.CoverImage, input.Body, oAuthID, createdAt, createdAt, input.PubDate, input.IsPrivate)
 	if err != nil {
 		errFeedback = append(errFeedback, err.Error())
 	}
 	var post = Post{}
-	stmtPostsOut, err := db.Prepare("Select post.slug, post.title, category.name, post.coverImage, post.body, post.createdAt,post.updatedAt, post.isPrivate, user.oAuthID, user.email, user.oAuthType, user.Username, user.Image from post join user on user.oAuthID = post.oAuthID join category on category.id = post.category where user.oAuthID = ? and post.title = ? order by createdAt desc")
+	stmtPostsOut, err := db.Prepare("Select post.slug, post.title, category.name, post.coverImage, post.body, post.createdAt,post.updatedAt, post.pubDate, post.isPrivate, user.oAuthID, user.email, user.oAuthType, user.Username, user.Image from post join user on user.oAuthID = post.oAuthID join category on category.slug = post.category where user.oAuthID = ? and post.title = ? order by createdAt desc")
 	if err != nil {
 		errFeedback = append(errFeedback, err.Error())
 	}
-	stmtPostsOut.QueryRow(oAuthID, input.Title).Scan(&post.Slug, &post.Title, &post.Category, &post.CoverImage, &post.Body, &post.CreatedAt, &post.UpdatedAt, &post.IsPrivate, &post.Author.OAuthID, &post.Author.EMail, &post.Author.OAuthType, &post.Author.Username, &post.Author.Image)
+	stmtPostsOut.QueryRow(oAuthID, input.Title).Scan(&post.Slug, &post.Title, &post.Category, &post.CoverImage, &post.Body, &post.CreatedAt, &post.UpdatedAt, &post.PubDate, &post.IsPrivate, &post.Author.OAuthID, &post.Author.EMail, &post.Author.OAuthType, &post.Author.Username, &post.Author.Image)
 	if post.Title == "" {
 		errFeedback = append(errFeedback, "Post not found")
 	}

@@ -11,9 +11,11 @@ import (
 
 //Query Type defines the input variables for a GET-Query on posts
 type Query struct {
-	author string `query:"author"`
-	limit  string `query:"limit"`
-	offset string `query:"offset"`
+	author   string `query:"author"`
+	limit    string `query:"limit"`
+	offset   string `query:"offset"`
+	PubDate  string `query:"pubDate"`
+	category string `query:"category"`
 }
 
 //Route Type for defining different API-Routes
@@ -35,6 +37,7 @@ type PostInput struct {
 	CoverImage string `json:"coverImage"`
 	Body       string `json:"body"`
 	IsPrivate  bool   `json:"isPrivate"`
+	PubDate    string `json:"pubDate"`
 }
 
 //Post defines a struct of Items in a Post
@@ -53,9 +56,23 @@ type Post struct {
 
 	UpdatedAt time.Time `json:"updatedAt"`
 
+	PubDate time.Time `json:"pubDate"`
+
 	IsPrivate string `json:"isPrivate"`
 
 	Author User `json:"author"`
+}
+
+//Category defines the struct of items in a Category
+type Category struct {
+	Slug string `json:"slug"`
+
+	Name string `json:"title"`
+}
+
+//CategoryInput defines the struct of a json input for Category
+type CategoryInput struct {
+	Name string `json:"title"`
 }
 
 //User defines the structure of a User in db
@@ -94,6 +111,7 @@ var (
 	GoogleOauthConfig *oauth2.Config
 	db                *sql.DB
 	errFeedback       []string
+	ers               error
 )
 
 var routes = Routes{
@@ -142,5 +160,29 @@ var routes = Routes{
 		http.MethodPost,
 		"/posts",
 		CreatePost,
+	},
+	{
+		"CreateCategory",
+		http.MethodPost,
+		"/category",
+		CreateCategory,
+	},
+	{
+		"GetCategories",
+		http.MethodGet,
+		"/category",
+		GetCategories,
+	},
+	{
+		"GetCategory",
+		http.MethodGet,
+		"/category/:slug",
+		GetCategory,
+	},
+	{
+		"DeleteCategory",
+		http.MethodDelete,
+		"/category/:slug",
+		DeleteCategory,
 	},
 }

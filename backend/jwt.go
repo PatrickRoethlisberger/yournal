@@ -50,7 +50,10 @@ var authMiddleware, err = jwt.New(&jwt.GinJWTMiddleware{
 		}
 		var oAuthType string
 		var oAuthID string
-		db = CreateDBConnection()
+		db, ers = CreateDBConnection()
+		if ers != nil {
+			errFeedback = append(errFeedback, ers.Error())
+		}
 		defer db.Close()
 
 		stmtUserOut, err := db.Prepare("Select oAuthType, oAuthID from user where oAuthID = ?")
@@ -85,7 +88,10 @@ var authMiddleware, err = jwt.New(&jwt.GinJWTMiddleware{
 		}, nil*/
 	},
 	Authorizator: func(data interface{}, c *gin.Context) bool {
-		db = CreateDBConnection()
+		db, ers = CreateDBConnection()
+		if ers != nil {
+			errFeedback = append(errFeedback, ers.Error())
+		}
 		defer db.Close()
 		stmtUserOut, err := db.Prepare("Select oAuthID from user where oAuthID = ?")
 		if err != nil {

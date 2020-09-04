@@ -42,7 +42,10 @@ func UpdateCurrentUser(c *gin.Context) {
 	if input.Username == "" && input.Image == "" {
 		errFeedback = append(errFeedback, "no input provided")
 	}
-	db = CreateDBConnection()
+	db, err = CreateDBConnection()
+	if err != nil {
+		errFeedback = append(errFeedback, err.Error())
+	}
 	defer db.Close()
 	if input.Username != "" {
 		stmtUserUpdate, err := db.Prepare("update user set username = ? where oAuthID = ?")

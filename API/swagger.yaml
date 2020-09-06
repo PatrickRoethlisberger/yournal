@@ -1,0 +1,490 @@
+openapi: 3.0.3
+info:
+  title: Yournal API
+  description: Documentation and definition of the Yournal API
+  version: 1.0.0
+  contact:
+    name: Marc Bannier, Patrick Röthlisberger
+    email: hi@yournal.tk
+    url: https://yournal.tk
+
+servers:
+  - url: 'https://api.yournal.tk/v1'
+    description: Main API endpoint
+
+paths:
+  /auth:
+    get:
+      summary: Get possible authentification methods
+      tags:
+        - Auth
+      operationId: GetAuthMethods
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/oAuthMethodResponse"
+        "422":
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericErrorSchema"
+    post:
+      summary: Post User Authentication Code
+      description: Post user Authentication Code after sucessful oAuth Authentication
+      tags:
+        - Auth
+      operationId: PostAuthCode
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/oAuthUserRequest"
+        description: Credentials to use
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/oAuthSessionResponse"
+        "401":
+          description: Unauthorized
+        "422":
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericErrorSchema"
+  /users:
+    get:
+      summary: Get current user
+      description: Gets the currently logged-in user
+      tags:
+        - User
+      security:
+        - Token: []
+      operationId: GetCurrentUser
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "401":
+          description: Unauthorized
+        "422":
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericErrorSchema"
+    put:
+      summary: Update current user
+      description: Updated user information for current user
+      tags:
+        - User
+      security:
+        - Token: []
+      operationId: UpdateCurrentUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserRequest"
+        description: User details to update. At least **one** field is required.
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "401":
+          description: Unauthorized
+        "422":
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericErrorSchema"
+  /posts:
+    get:
+      summary: Get posts
+      description: Get posts from latest to oldest. Only public posts
+       or Posts made by the logged in user will be returned. It's possible
+       to filter by posts made by an specific user with the secified URL
+       parameter.
+      tags:
+        - Posts
+      security:
+        - Token: []
+      operationId: GetPosts
+      parameters:
+        - name: author
+          in: query
+          description: Filter by author
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Limit number of posts returned (default is 15)
+          required: false
+          schema:
+            type: integer
+            default: 15
+        - name: offset
+          in: query
+          description: Offset of posts (default is 0)
+          required: false
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MultiplePostsResponse"
+        "401":
+          description: Unauthorized
+        "422":
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericErrorSchema"
+  "/posts/{slug}":
+    get:
+      summary: Get a post
+      description: Get a post by slug
+      tags:
+        - Posts
+      security:
+        - Token: []
+      operationId: GetPost
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          description: Slug of the post to get
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SinglePostResponse"
+        "422":
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericErrorSchema"
+    put:
+      summary: Update a post
+      description: Update a post. Can only be edited by the author
+      tags:
+        - Posts
+      security:
+        - Token: []
+      operationId: UpdatePost
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          description: Slug of the post to update
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePostRequest"
+        description: Post to update
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SinglePostResponse"
+        "401":
+          description: Unauthorized
+        "422":
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericErrorSchema"
+    delete:
+      summary: Delete a post
+      description: Delete a post. Can only be deleted by the author
+      tags:
+        - Posts
+      security:
+        - Token: []
+      operationId: DeletePost
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          description: Slug of the post to delete
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Unauthorized
+        "422":
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericErrorSchema"
+
+components:
+  securitySchemes:
+    Token:
+      description: >+
+        For accessing private API calls, you must be logged in an being in
+        pocession of an valid JWT token.
+
+        A JWT token is generated by the API by logging in via /users/login.
+
+
+        The following format must be in the 'Authorization' header :
+
+            Token: xxxxxx.yyyyyyy.zzzzzz
+
+      type: apiKey
+      name: Authorization
+      in: header
+  schemas:
+    oAuthMethod:
+      type: object
+      properties:
+        oAuthName:
+          type: string
+        oAuthLink:
+          description: Link to oAuth Provider with allready set paraneters and correct callback URL
+          type: string
+        oAuthLogo:
+          type: string
+        oAuthColor:
+          type: string
+      required:
+        - oAuthName
+        - oAuthLink
+        - oAuthLogo
+        - oAuthColor
+    oAuthMethodResponse:
+      type: object
+      properties:
+        oAuthMethods:
+          type: array
+          items:
+            $ref: "#/components/schemas/oAuthMethod"
+        oAuthMethodCount:
+          type: integer
+    oAuthType:
+      type: string
+      enum: [Apple, Google, Microsoft]
+    oAuthUser:
+      type: object
+      properties:
+        state:
+          type: string
+        code:
+          type: string
+        oAuthType:
+          $ref: "#/components/schemas/oAuthType"
+      required:
+        - state
+        - code
+        - oAuthType
+    oAuthUserRequest:
+      type: object
+      properties:
+        oAuthUser:
+          $ref: "#/components/schemas/oAuthUser"
+      required:
+        - oAuthUser
+    oAuthSession:
+      type: object
+      properties:
+        expiryTime:
+          type: string
+          format: time-date
+        token:
+          type: string
+      required:
+        - expiryTime
+        - token
+    oAuthSessionResponse:
+      type: object
+      properties:
+        oAuthSession:
+          $ref: "#/components/schemas/oAuthSession"
+      required:
+        - oAuthSession
+    User:
+      type: object
+      properties:
+        email:
+          type: string
+          description: User email provided by oAuth Provider
+        oAuthType:
+          $ref: "#/components/schemas/oAuthType"
+          description: oAuth type chosen by user
+        oAuthID:
+          type: string
+          description: oAuth ID provided by oAuth Provider
+        username:
+          type: string
+          description: User chosen username
+        image:
+          type: string
+          description: User chosen profileimage
+      required:
+        - email
+        - oAuthType
+        - oAuthID
+    UserResponse:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+      required:
+        - user
+    UpdateUser:
+      type: object
+      properties:
+        username:
+          type: string
+        image:
+          type: string
+    UpdateUserRequest:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/UpdateUser"
+      required:
+        - user
+    Post:
+      type: object
+      properties:
+        slug:
+          type: string
+        title:
+          type: string
+        coverImage:
+          type: string
+        body:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        isPrivate:
+          type: boolean
+          default: true
+        author:
+          $ref: "#/components/schemas/User"
+      required:
+        - slug
+        - title
+        - body
+        - createdAt
+        - updatedAt
+        - author
+    SinglePostResponse:
+      type: object
+      properties:
+        post:
+          $ref: "#/components/schemas/Post"
+      required:
+        - post
+    MultiplePostsResponse:
+      type: object
+      properties:
+        posts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post"
+        postCount:
+          type: integer
+      required:
+        - posts
+        - postCount
+    NewPost:
+      type: object
+      properties:
+        title:
+          type: string
+        coverImage:
+          type: string
+        body:
+          type: string
+        isPrivate:
+          type: boolean
+          default: true
+      required:
+        - title
+        - description
+        - body
+        - isPrivate
+    NewPostRequest:
+      type: object
+      properties:
+        post:
+          $ref: "#/components/schemas/NewPost"
+      required:
+        - post
+    UpdatePost:
+      type: object
+      properties:
+        title:
+          type: string
+        coverImage:
+          type: string
+        body:
+          type: string
+        isPrivate:
+          type: boolean
+    UpdatePostRequest:
+      type: object
+      properties:
+        post:
+          $ref: "#/components/schemas/UpdatePost"
+      required:
+        - post
+    GenericErrorSchema:
+      type: object
+      properties:
+        errors:
+          type: object
+          properties:
+            body:
+              type: array
+              items:
+                type: string
+          required:
+            - body
+      required:
+        - errors
+

@@ -9,6 +9,13 @@ import (
 	"golang.org/x/oauth2"
 )
 
+//Auth gives the struct of an authentication trial
+type Auth struct {
+	State     string `json:"state"`
+	Code      string `json:"code"`
+	OAuthType string `json:"oAuthType"`
+}
+
 //Query Type defines the input variables for a GET-Query on posts
 type Query struct {
 	author   string `query:"author"`
@@ -56,7 +63,7 @@ type Post struct {
 
 	UpdatedAt time.Time `json:"updatedAt"`
 
-	PubDate time.Time `json:"pubDate"`
+	PubDate string `json:"pubDate"`
 
 	IsPrivate string `json:"isPrivate"`
 
@@ -67,12 +74,12 @@ type Post struct {
 type Category struct {
 	Slug string `json:"slug"`
 
-	Name string `json:"title"`
+	Name string `json:"name"`
 }
 
 //CategoryInput defines the struct of a json input for Category
 type CategoryInput struct {
-	Name string `json:"title"`
+	Name string `json:"name"`
 }
 
 //User defines the structure of a User in db

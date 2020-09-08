@@ -86,6 +86,8 @@ func GetPosts(c *gin.Context) {
 	if query.offset == "" {
 		query.offset = "0"
 	}
+	query.limit = "15"
+	query.offset = "0"
 	if query.author != "" {
 		var user, err = GetUserInformation(oAuthID)
 		if err != nil {
@@ -249,7 +251,7 @@ func CreatePost(c *gin.Context) {
 		errFeedback = append(errFeedback, err.Error())
 	}
 	createdAt := time.Now()
-	stmtPostCreate, err := db.Prepare("Insert into post (title,category,coverImage,body,oAuthID,createdAt,updatedAt,pubDate,isPrivate) Values (?,(Select id from category where name = ?),?,?,?,?,?,?,?)")
+	stmtPostCreate, err := db.Prepare("Insert into post (title,category,coverImage,body,oAuthID,createdAt,updatedAt,pubDate,isPrivate) Values (?,(Select slug from category where name = ?),?,?,?,?,?,?,?)")
 	_, err = stmtPostCreate.Exec(input.Title, input.Category, input.CoverImage, input.Body, oAuthID, createdAt, createdAt, input.PubDate, input.IsPrivate)
 	if err != nil {
 		errFeedback = append(errFeedback, err.Error())

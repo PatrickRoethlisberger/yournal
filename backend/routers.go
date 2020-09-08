@@ -11,10 +11,10 @@ func NewRouter() *gin.Engine {
 	router := gin.Default()
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
-	router.GET("/", Index)
-	router.POST("/auth", authMiddleware.LoginHandler)
-	router.GET("/auth", ChoseAuthProvider)
-	router.GET("/auth/refresh_token", authMiddleware.RefreshHandler)
+	router.GET("/v1/", Index)
+	router.POST("/v1/auth", authMiddleware.LoginHandler)
+	router.GET("/v1/auth", ChoseAuthProvider)
+	router.GET("/v1/auth/refresh_token", authMiddleware.RefreshHandler)
 
 	return router
 }

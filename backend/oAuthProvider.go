@@ -14,7 +14,7 @@ import (
 //ChoseAuthProvider user to give the oAuthInformation to FrontEnd
 func ChoseAuthProvider(c *gin.Context) {
 	GoogleOauthConfig = &oauth2.Config{
-		RedirectURL:  "http://localhost:8080/auth",
+		RedirectURL:  "https://yournal.tk/login",
 		ClientID:     os.Getenv("google_id"),
 		ClientSecret: os.Getenv("google_pw"),
 		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email"},
@@ -24,7 +24,7 @@ func ChoseAuthProvider(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"oAuthMethods": gin.H{"oAuthName": "Google",
 			"oAuthLink":  url,
-			"oAuthLogo":  "https://developers.google.com/identity/images/btn_google_signin_dark_normal_web.png",
+			"oAuthLogo":  "google",
 			"oAuthColor": "#4285F4",
 		},
 		"oAuthMethodCount": 1,

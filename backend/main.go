@@ -7,7 +7,7 @@ func main() {
 
 	router := NewRouter()
 
-	NewRouterGroup(router, "/")
+	NewRouterGroup(router, "/v1")
 
-	log.Fatal(router.Run(":8080"))
+	log.Fatal(router.Run("localhost:3000"))
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	jwt "github.com/appleboy/gin-jwt/v2"
@@ -47,7 +48,7 @@ func GetCategory(c *gin.Context) {
 		errFeedback = append(errFeedback, err.Error())
 	}
 	defer db.Close()
-	stmtPostsOut, err := db.Prepare("Select category.slug, category.name from category where user.oAuthID = ? and category.slug = ?")
+	stmtPostsOut, err := db.Prepare("Select category.slug, category.name from category where category.oAuthID = ? and category.slug = ?")
 	if err != nil {
 		errFeedback = append(errFeedback, err.Error())
 	}
@@ -70,6 +71,7 @@ func GetCategory(c *gin.Context) {
 func GetCategories(c *gin.Context) {
 	tokenClaims := jwt.ExtractClaims(c)
 	oAuthID := tokenClaims["id"].(string)
+	fmt.Println(tokenClaims)
 	errFeedback = nil
 	var categories = []Category{}
 	db, err := CreateDBConnection()
@@ -121,13 +123,13 @@ func CreateCategory(c *gin.Context) {
 	if err := c.ShouldBindJSON(&input); err != nil {
 		errFeedback = append(errFeedback, err.Error())
 	}
-	stmtPostCreate, err := db.Prepare("Insert into category (name) Values (?)")
-	_, err = stmtPostCreate.Exec(input.Name)
+	stmtPostCreate, err := db.Prepare("Insert into category (name,oauthid) Values (?,?)")
+	_, err = stmtPostCreate.Exec(input.Name, oAuthID)
 	if err != nil {
 		errFeedback = append(errFeedback, err.Error())
 	}
 	var category = Category{}
-	stmtPostsOut, err := db.Prepare("Select category.slug, category.name from category where user.oAuthID = ? and category.name = ?")
+	stmtPostsOut, err := db.Prepare("Select category.slug, category.name from category where category.oAuthID = ? and category.name = ?")
 	if err != nil {
 		errFeedback = append(errFeedback, err.Error())
 	}

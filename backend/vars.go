@@ -18,11 +18,12 @@ type Auth struct {
 
 //Query Type defines the input variables for a GET-Query on posts
 type Query struct {
-	author   string `query:"author"`
-	limit    string `query:"limit"`
-	offset   string `query:"offset"`
-	PubDate  string `query:"pubDate"`
-	category string `query:"category"`
+	author      string `query:"author"`
+	limit       string `query:"limit"`
+	offset      string `query:"offset"`
+	PubDateFrom string `query:"pubDateFrom"`
+	PubDateTo   string `query:"pubDateTo"`
+	category    string `query:"category"`
 }
 
 //Route Type for defining different API-Routes
@@ -191,5 +192,11 @@ var routes = Routes{
 		http.MethodDelete,
 		"/category/:slug",
 		DeleteCategory,
+	},
+	{
+		"UploadFile",
+		http.MethodPost,
+		"/assets",
+		FileUpload,
 	},
 }

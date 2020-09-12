@@ -10,6 +10,7 @@ import (
 
 //CreateDBConnection creates a connection to the mysql Database
 func CreateDBConnection() (*sql.DB, error) {
+	//Define DB connection
 	dbconnectionstring := os.Getenv("sql_username") + ":" + os.Getenv("sql_password") + "@tcp(localhost:3306)/" + os.Getenv("sql_db") + "parseTime=true"
 	db, err := sql.Open("mysql", dbconnectionstring)
 	if err != nil {

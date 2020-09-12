@@ -15,7 +15,6 @@ func NewRouter() *gin.Engine {
 	router.POST("/v1/auth", authMiddleware.LoginHandler)
 	router.GET("/v1/auth", ChoseAuthProvider)
 	router.GET("/v1/auth/refresh_token", authMiddleware.RefreshHandler)
-
 	return router
 }
 
@@ -42,5 +41,5 @@ func NewRouterGroup(router *gin.Engine, path string) *gin.RouterGroup {
 
 // Index is the index handler.
 func Index(c *gin.Context) {
-	c.String(http.StatusOK, "Hello World!")
+	c.String(http.StatusOK, "API is fully functional")
 }

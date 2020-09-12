@@ -79,7 +79,7 @@ var authMiddleware, err = jwt.New(&jwt.GinJWTMiddleware{
 					UserID: userdata.ID,
 					Email:  userdata.Email,
 				}, nil
-			} else if c.Query("oAuthType") == oAuthType && userdata.ID == oAuthID {
+			} else if userdata.ID == oAuthID {
 				return &Benutzer{
 					UserID: userdata.ID,
 					Email:  userdata.Email,

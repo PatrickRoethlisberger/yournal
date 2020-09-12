@@ -10,10 +10,12 @@ import (
 
 // DeletePost deletes a post on a given slug
 func DeletePost(c *gin.Context) {
+	//Get informations from Request
 	tokenClaims := jwt.ExtractClaims(c)
 	oAuthID := tokenClaims["id"].(string)
 	slug := c.Param("slug")
 	errFeedback = nil
+	//Create database connection
 	db, err := CreateDBConnection()
 	if err != nil {
 		errFeedback = append(errFeedback, err.Error())
@@ -78,7 +80,8 @@ func GetPosts(c *gin.Context) {
 	query.limit, _ = c.GetQuery("limit")
 	query.author, _ = c.GetQuery("author")
 	query.offset, _ = c.GetQuery("offset")
-	query.PubDate, _ = c.GetQuery("pubDate")
+	query.PubDateFrom, _ = c.GetQuery("pubDateFrom")
+	query.PubDateTo, _ = c.GetQuery("pubDateTo")
 	query.category, _ = c.GetQuery("category")
 	if query.limit == "" {
 		query.limit = "15"
@@ -101,8 +104,12 @@ func GetPosts(c *gin.Context) {
 	} else {
 		whereClause = "where (user.oAuthID ='" + oAuthID + "' or post.isPrivate = 0)"
 	}
-	if query.PubDate != "" {
-		whereClause += " and post.pubDate = '" + query.PubDate + "'"
+	if query.PubDateFrom != "" && query.PubDateTo != "" {
+		whereClause += " and post.pubDate >= '" + query.PubDateFrom + "' and post.PubDate <= '" + query.PubDateTo + "'"
+	} else if query.PubDateTo != "" {
+		whereClause += " and post.pubDate = '" + query.PubDateTo + "'"
+	} else if query.PubDateFrom != "" {
+		whereClause += " and post.pubDate = '" + query.PubDateFrom + "'"
 	}
 	if query.category != "" {
 		whereClause += " and category.name = '" + query.category + "'"

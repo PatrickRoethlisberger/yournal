@@ -27,19 +27,22 @@ func CreateDBConnection() (*sql.DB, error) {
 
 //GetUserInformation gets the userinformation for the current User from DB
 func GetUserInformation(oAuthID string) (user User, err error) {
-	//var username, email, image, oAuthType string = "", "", "", ""
+	//Create database connection
 	db, err := CreateDBConnection()
 	if err != nil {
 		return user, errors.New("Failed to get Database connection")
 	}
 	defer db.Close()
+	//Prepare SQL Statemment for getting user informations
 	stmtUserOut, err := db.Prepare("Select oAuthID, oAuthType, username, email, image from user where oAuthID = ?")
 	if err != nil {
 		return user, errors.New("Failed to get User properties")
 	}
 	stmtUserOut.QueryRow(oAuthID).Scan(&user.OAuthID, &user.OAuthType, &user.Username, &user.EMail, &user.Image)
+	//Give back error in case user doesn't exist
 	if user.OAuthID == "" {
 		return user, errors.New("Failed to get User properties")
 	}
+	//Give back user informations
 	return user, nil
 }

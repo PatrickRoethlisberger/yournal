@@ -9,6 +9,12 @@ import (
 	"golang.org/x/oauth2"
 )
 
+//Benutzer Type for UserCredentials in JWT generator
+type Benutzer struct {
+	UserID string
+	Email  string
+}
+
 //Auth gives the struct of an authentication trial
 type Auth struct {
 	State     string `json:"state"`
@@ -101,6 +107,12 @@ type User struct {
 	Image string `json:"image,omitempty"`
 }
 
+//UserInput defines the structure of a User that ist given by post request
+type UserInput struct {
+	Username string `json:"username"`
+	Image    string `json:"image"`
+}
+
 // Routes is the list of the generated Route.
 type Routes []Route
 
@@ -112,7 +124,8 @@ type UserData struct {
 	VerifiedEmail bool   `json:"verified_email"`
 }
 
-const secret string = "Yournal_secret"
+//secret string is used for oAuthState
+const secret string = "7ssRUv5Bp1J89HYzWHbr"
 
 var (
 	//GoogleOauthConfig defines the configuration for Google Authentication
@@ -122,6 +135,7 @@ var (
 	ers               error
 )
 
+//routes defines the used routergroup behind login wall
 var routes = Routes{
 	{
 		"DeletePost",

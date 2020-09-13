@@ -14,6 +14,7 @@ func DeleteCategory(c *gin.Context) {
 	tokenClaims := jwt.ExtractClaims(c)
 	oAuthID := tokenClaims["id"].(string)
 	slug := c.Param("slug")
+	//Reset Errorfeedback
 	errFeedback = nil
 	//Create database connection
 	db, err := CreateDBConnection()
@@ -47,8 +48,9 @@ func GetCategory(c *gin.Context) {
 	oAuthID := tokenClaims["id"].(string)
 	slug := c.Param("slug")
 	var category = Category{}
+	//Reset Errorfeedback
 	errFeedback = nil
-	//create database connection
+	//Create database connection
 	db, err := CreateDBConnection()
 	if err != nil {
 		errFeedback = append(errFeedback, err.Error())
@@ -81,6 +83,7 @@ func GetCategories(c *gin.Context) {
 	tokenClaims := jwt.ExtractClaims(c)
 	oAuthID := tokenClaims["id"].(string)
 	fmt.Println(tokenClaims)
+	//Reset Errorfeedback
 	errFeedback = nil
 	var categories = []Category{}
 	//Create database connection
@@ -99,7 +102,7 @@ func GetCategories(c *gin.Context) {
 		errFeedback = append(errFeedback, err.Error())
 	}
 	var rowCount int = 0
-	//store categories to an object for json output
+	//Store categories to an object for json output
 	for rows.Next() {
 		var category Category
 		err = rows.Scan(&category.Slug, &category.Name)
@@ -127,6 +130,7 @@ func CreateCategory(c *gin.Context) {
 	//Get informations from Request
 	tokenClaims := jwt.ExtractClaims(c)
 	oAuthID := tokenClaims["id"].(string)
+	//Reset Errorfeedback
 	errFeedback = nil
 	//Create database connection
 	db, err := CreateDBConnection()
@@ -145,7 +149,7 @@ func CreateCategory(c *gin.Context) {
 		errFeedback = append(errFeedback, err.Error())
 	}
 	var category = Category{}
-	//get inserted category with slug
+	//Get inserted category with slug
 	stmtPostsOut, err := db.Prepare("Select category.slug, category.name from category where category.oAuthID = ? and category.name = ?")
 	if err != nil {
 		errFeedback = append(errFeedback, err.Error())

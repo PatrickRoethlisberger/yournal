@@ -20,7 +20,9 @@ func ChoseAuthProvider(c *gin.Context) {
 		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email"},
 		Endpoint:     google.Endpoint,
 	}
+	//Generate a google oAuth URL for authentication
 	url := GoogleOauthConfig.AuthCodeURL(oauthStateString)
+	//Give back oAuth methods
 	c.JSON(http.StatusOK, gin.H{
 		"oAuthMethods": gin.H{"oAuthName": "Google",
 			"oAuthLink":  url,
@@ -33,13 +35,16 @@ func ChoseAuthProvider(c *gin.Context) {
 
 //GoogleGetUserInfo gives back the information for the authenticated user for saving them into database
 func GoogleGetUserInfo(state string, code string) ([]byte, error) {
+	//Check if authentication state is valid from provided url
 	if state != oauthStateString {
 		return nil, fmt.Errorf("invalid oauth state")
 	}
+	//Get token from google
 	token, err := GoogleOauthConfig.Exchange(oauth2.NoContext, code)
 	if err != nil {
 		return nil, fmt.Errorf("code exchange failed: %s", err.Error())
 	}
+	//Get userinformation from google with given token
 	response, err := http.Get("https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + token.AccessToken)
 	if err != nil {
 		return nil, fmt.Errorf("failed getting user info: %s", err.Error())

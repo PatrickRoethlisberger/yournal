@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// NewRouter returns a new router.
+// NewRouter returns a new router with defined paths
 func NewRouter() *gin.Engine {
 	router := gin.Default()
 	router.Use(gin.Logger())
@@ -21,8 +21,10 @@ func NewRouter() *gin.Engine {
 //NewRouterGroup returns a Router Group for authenticated access
 func NewRouterGroup(router *gin.Engine, path string) *gin.RouterGroup {
 	group := router.Group(path)
+	//Use jwt middleware for router group
 	group.Use(authMiddleware.MiddlewareFunc())
 	{
+		//Get different api routes and present them to router group
 		for _, route := range routes {
 			switch route.Method {
 			case http.MethodGet:
@@ -39,7 +41,7 @@ func NewRouterGroup(router *gin.Engine, path string) *gin.RouterGroup {
 	return group
 }
 
-// Index is the index handler.
+// Index is the index handler and is only used for testing purposes
 func Index(c *gin.Context) {
 	c.String(http.StatusOK, "API is fully functional")
 }

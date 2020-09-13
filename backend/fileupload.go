@@ -12,7 +12,7 @@ import (
 //FileUpload uploads a file to the webserver and gives back the path
 func FileUpload(c *gin.Context) {
 
-	// Source
+	//Get informations from Request
 	file, err := c.FormFile("file")
 	if err != nil {
 		c.JSON(422, gin.H{
@@ -29,13 +29,14 @@ func FileUpload(c *gin.Context) {
 	//webpath defines the webaccessible path for the yournal
 	webpath := "assets.yournal.tk/" + filename
 
-	//saving the uploaded file to the local path
+	//Saving the uploaded file to the local path
 	if err := c.SaveUploadedFile(file, localpath); err != nil {
+		//Give back the error message from fileupload
 		c.JSON(422, gin.H{
 			"errors": gin.H{"body": err},
 		})
 		return
-	}
+	} // Give back the webpath for storing into database
 	c.JSON(http.StatusOK, gin.H{
 		"filepath": webpath,
 	})

@@ -12,8 +12,6 @@ import (
 var (
 	//IdentityKey is not needed and set to Framework default
 	identityKey = "id"
-	//oauthStateString is a random string used for oauth authentication
-	oauthStateString = String(10)
 )
 
 //authMiddleware defines the middleware parameters for jwt
@@ -46,7 +44,7 @@ var authMiddleware, err = jwt.New(&jwt.GinJWTMiddleware{
 			errFeedback = append(errFeedback, err.Error())
 		}
 		//Get the user information from google by given state and code
-		content, err := GoogleGetUserInfo(auth.State, auth.Code)
+		content, err := GoogleGetUserInfo(auth.Code)
 		if err != nil {
 			fmt.Println(err.Error())
 		}

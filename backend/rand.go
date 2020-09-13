@@ -8,13 +8,13 @@ import (
 //Define charset used for randomized string
 const charset = "abcdefghijklmnopqrstuvwxyz" + "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
-//Get random number
-var seededRand *rand.Rand = rand.New(
-	rand.NewSource(time.Now().UnixNano()))
+var seededRand *rand.Rand
 
 //StringWithCharset returns String with given Charset
 func StringWithCharset(length int, charset string) string {
 	b := make([]byte, length)
+	//Get random number
+	seededRand = rand.New(rand.NewSource(time.Now().UnixNano()))
 	for i := range b {
 		b[i] = charset[seededRand.Intn(len(charset))]
 	}

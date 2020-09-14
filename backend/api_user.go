@@ -14,11 +14,10 @@ func GetCurrentUser(c *gin.Context) {
 	oAuthID := tokenClaims["id"].(string)
 	//Get user information by given oAuthID
 	var user, err = GetUserInformation(oAuthID)
-	errorMessage := err.Error()
 	//Give back error from getting user information
 	if err != nil {
 		c.JSON(422, gin.H{
-			"errors": gin.H{"body": errorMessage},
+			"errors": gin.H{"body": err.Error()},
 		})
 	} else { //Give back current user
 		c.JSON(http.StatusOK, gin.H{

@@ -94,9 +94,9 @@ func GetPosts(c *gin.Context) {
 	query.PubDateFrom, _ = c.GetQuery("pubDateFrom")
 	query.PubDateTo, _ = c.GetQuery("pubDateTo")
 	query.category, _ = c.GetQuery("category")
-	//Define limit and offset for select statement, user limit = 15, offset = 0 as default
+	//Define limit and offset for select statement, user limit = 1000000, offset = 0 as default
 	if query.limit == "" {
-		query.limit = "15"
+		query.limit = "1000000"
 	}
 	if query.offset == "" {
 		query.offset = "0"

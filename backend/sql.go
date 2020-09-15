@@ -11,7 +11,7 @@ import (
 //CreateDBConnection creates a connection to the mysql Database
 func CreateDBConnection() (*sql.DB, error) {
 	//Define DB connection
-	dbconnectionstring := os.Getenv("sql_username") + ":" + os.Getenv("sql_password") + "@tcp(localhost:3306)/" + os.Getenv("sql_db") + "parseTime=true"
+	dbconnectionstring := os.Getenv("sql_username") + ":" + os.Getenv("sql_password") + "@tcp(localhost:3306)/" + os.Getenv("sql_db") + "?parseTime=true"
 	db, err := sql.Open("mysql", dbconnectionstring)
 	if err != nil {
 		return nil, err
@@ -34,11 +34,11 @@ func GetUserInformation(oAuthID string) (user User, err error) {
 	}
 	defer db.Close()
 	//Prepare SQL Statemment for getting user informations
-	stmtUserOut, err := db.Prepare("Select oAuthID, oAuthType, username, email, image from user where oAuthID = ?")
+	stmtUserOut, err := db.Prepare("Select oAuthID, oAuthType, email, image, username from user where oAuthID = ?")
 	if err != nil {
 		return user, errors.New("Failed to get User properties")
 	}
-	stmtUserOut.QueryRow(oAuthID).Scan(&user.OAuthID, &user.OAuthType, &user.Username, &user.EMail, &user.Image)
+	stmtUserOut.QueryRow(oAuthID).Scan(&user.OAuthID, &user.OAuthType, &user.EMail, &user.Image, &user.Username)
 	//Give back error in case user doesn't exist
 	if user.OAuthID == "" {
 		return user, errors.New("Failed to get User properties")

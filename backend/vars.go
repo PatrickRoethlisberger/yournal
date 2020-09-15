@@ -101,10 +101,10 @@ type User struct {
 	OAuthID string `json:"oAuthID"`
 
 	// User chosen username
-	Username string `json:"username,omitempty"`
+	Username string `json:"username"`
 
 	// User chosen profileimage
-	Image string `json:"image,omitempty"`
+	Image string `json:"image"`
 }
 
 //UserInput defines the structure of a User that ist given by post request

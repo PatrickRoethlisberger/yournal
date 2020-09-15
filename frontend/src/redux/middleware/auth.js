@@ -136,7 +136,7 @@ export const getUserFlow = ({ dispatch }) => (next) => (action) => {
       dispatch(
         showNotification(
           'warning',
-          'Das Token ist nicht mehr gültig - bitte erneut einlogen 🔐'
+          'Ihre Anmeldung ist leider abgelaufen - bitte erneut einloggen 🔐'
         )
       );
       history.push('/login');

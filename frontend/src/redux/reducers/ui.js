@@ -9,7 +9,6 @@ import {
 
 const initUi = {
   paletteType: 'dark',
-  manualThemeSet: false,
   pending: false,
   pendingFeatures: {},
   showNotification: false,
@@ -19,8 +18,10 @@ const initUi = {
 export default function uiReducer(state = initUi, action) {
   switch (action.type) {
     case GO_DARK:
+      localStorage.setItem('theme', 'dark');
       return { ...state, paletteType: 'dark' };
     case GO_LIGHT:
+      localStorage.setItem('theme', 'light');
       return { ...state, paletteType: 'light' };
 
     case SHOW_SPINNER:

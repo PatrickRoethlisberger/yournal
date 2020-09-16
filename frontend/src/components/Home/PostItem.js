@@ -26,7 +26,7 @@ const PostItem = ({ title, category, coverImage, body, slug, pubDate }) => {
               {body}
             </Typography>
             <Typography variant="subtitle1" color="primary">
-              Continue reading...
+              Zum Eintrag...
             </Typography>
           </CardContent>
         </div>

@@ -20,10 +20,9 @@ import history from '../../history';
 export const getAuthtypeFlow = ({ dispatch }) => (next) => (action) => {
   next(action);
 
-  let requestUrl;
   switch (action.type) {
     case GET_AUTHTYPE:
-      requestUrl = `${conf.apiRoot}/auth`;
+      const requestUrl = `${conf.apiRoot}/auth`;
 
       dispatch(
         apiRequest({
@@ -50,10 +49,9 @@ export const getAuthtypeFlow = ({ dispatch }) => (next) => (action) => {
 export const postAuthParamsFlow = ({ dispatch }) => (next) => (action) => {
   next(action);
 
-  let requestUrl;
   switch (action.type) {
     case POST_AUTHPARAMS:
-      requestUrl = `${conf.apiRoot}/auth`;
+      const requestUrl = `${conf.apiRoot}/auth`;
       const param = {
         code: action.payload.oAuthCode,
         state: action.payload.oAuthState,
@@ -99,10 +97,9 @@ export const saveToLocalStorageFlow = ({ dispatch }) => (next) => (action) => {
 export const getUserFlow = ({ dispatch }) => (next) => (action) => {
   next(action);
 
-  let requestUrl;
   switch (action.type) {
     case GET_USER:
-      requestUrl = `${conf.apiRoot}/users`;
+      const requestUrl = `${conf.apiRoot}/users`;
       dispatch(
         apiRequest({
           body: null,
@@ -133,10 +130,9 @@ export const getUserFlow = ({ dispatch }) => (next) => (action) => {
 export const postUsernameFlow = ({ dispatch }) => (next) => (action) => {
   next(action);
 
-  let requestUrl;
   switch (action.type) {
     case POST_USERNAME:
-      requestUrl = `${conf.apiRoot}/users`;
+      const requestUrl = `${conf.apiRoot}/users`;
       const param = {
         username: action.payload,
       };

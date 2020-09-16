@@ -24,6 +24,7 @@ const SetUsernameDialog = () => {
     (state) => state.ui.pendingFeatures[POST_USERNAME]
   );
 
+  // Show dialog when a user is logged in but doesn't have username assigned
   const showDialog = () => {
     if (authState.user.username == '' && authState.isLoggedIn) {
       return true;
@@ -79,22 +80,6 @@ const SetUsernameDialog = () => {
         </DialogActions>
       </Dialog>
     </form>
-    // <Snackbar
-    //   open={uiState.showNotification}
-    //   autoHideDuration={6000}
-    //   anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-    //   TransitionComponent={TransitionLeft}
-    //   onClose={handleClose}
-    // >
-    //   <Alert
-    //     variant="filled"
-    //     severity={uiState.notification.severity}
-    //     color={uiState.notification.severity}
-    //     onClose={handleClose}
-    //   >
-    //     {uiState.notification.message}
-    //   </Alert>
-    // </Snackbar>
   );
 };
 

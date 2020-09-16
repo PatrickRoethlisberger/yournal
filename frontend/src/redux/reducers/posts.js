@@ -28,7 +28,7 @@ export default function postsReducer(state = initialState, action) {
       // Count each unique date from the API response in an object
       var counts = {};
       action.payload.posts.forEach(function (x) {
-        var xDate = moment(new Date(x.createdAt)).format('YYYY-MM-DD');
+        var xDate = moment(new Date(x.pubDate)).format('YYYY-MM-DD');
         counts[xDate] = (counts[xDate] || 0) + 1;
       });
 

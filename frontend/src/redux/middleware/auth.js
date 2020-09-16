@@ -114,9 +114,6 @@ export const getUserFlow = ({ dispatch }) => (next) => (action) => {
       break;
     case `${GET_USER} ${API_SUCCESS}`:
       dispatch(saveUser(action.payload));
-        // TODO: Add username setter thingi
-        dispatch(showNotification('error', 'User doesnt have  usernaem'));
-      }
       break;
 
     case `${GET_USER} ${API_ERROR}`:

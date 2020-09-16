@@ -3,6 +3,7 @@ import { Switch, Route, Redirect } from 'react-router-dom';
 import MenuBar from './components/MenuBar';
 import Home from './components/Home';
 import Login from './components/Login';
+import Post from './components/Post';
 import Snackbar from './components/Snackbar';
 import { useSelector, useDispatch } from 'react-redux';
 import {
@@ -26,6 +27,7 @@ function App() {
           <Switch>
             <Route exact path={'/'} component={Home} />
             <Route path={'/login'} component={Login} />
+            <Route path={'/post/:slug'} component={Post} />
             <Redirect to={'/'} />
           </Switch>
         </Container>

@@ -6,12 +6,20 @@ import reducers from './reducers';
 import { api } from './middleware/api';
 import { authMiddleware } from './middleware/auth';
 import { appMiddleware } from './middleware/app';
+import { postsMiddleware } from './middleware/post';
 
 import { initApp } from './actions/app';
 
 const store = createStore(
   reducers,
-  composeWithDevTools(applyMiddleware(...authMiddleware, api, ...appMiddleware))
+  composeWithDevTools(
+    applyMiddleware(
+      ...authMiddleware,
+      api,
+      ...appMiddleware,
+      ...postsMiddleware
+    )
+  )
 );
 
 store.dispatch(initApp());

@@ -27,7 +27,7 @@ const Login = () => {
   const classes = useStyles();
 
   const ShowData = () => {
-    if (authState.isLoggedIn) {
+    if (authState.isLoggedIn && authState.user.username != '') {
       return <Redirect to={'/'} />;
     } else if (loading) {
       return <CircularProgress />;

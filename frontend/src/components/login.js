@@ -28,12 +28,7 @@ const Login = () => {
 
   const ShowData = () => {
     if (authState.isLoggedIn) {
-      return (
-        <Typography variant="caption" gutterBottom>
-          You're logged in
-        </Typography>
-      );
-      // return <Redirect to={'/'} />;
+      return <Redirect to={'/'} />;
     } else if (loading) {
       return <CircularProgress />;
     } else if (_.isEmpty(authState.types)) {
@@ -56,8 +51,7 @@ const Login = () => {
         </Button>
       );
     }
-
-    return <p>error getting auth types</p>;
+    return <p>fatal error - please try again later</p>;
   };
 
   return (

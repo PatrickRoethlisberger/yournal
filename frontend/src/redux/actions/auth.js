@@ -7,6 +7,7 @@ export const SAVE_AUTHTOKEN_LOCALSTORAGE = `${prefix} Saving token into local st
 export const SAVE_AUTHTOKEN = `${prefix} Saving token into state`;
 export const GET_USER = `${prefix} Populate user object`;
 export const SAVE_USER = `${prefix} Saving user object into state`;
+export const POST_USERNAME = `${prefix} Post username set by User`;
 export const LOGOUT = `${prefix} Logout`;
 
 export const getAuthType = () => ({
@@ -42,6 +43,11 @@ export const getUser = () => ({
 
 export const saveUser = (payload) => ({
   type: SAVE_USER,
+  payload: payload,
+});
+
+export const postUsername = (payload) => ({
+  type: POST_USERNAME,
   payload: payload,
 });
 

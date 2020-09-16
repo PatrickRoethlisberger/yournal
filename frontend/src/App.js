@@ -12,6 +12,7 @@ import {
   makeStyles,
 } from '@material-ui/core';
 import muiTheme from './helpers/muiTheme';
+import SetUsernameDialog from './components/SetUsernameDialog';
 
 function App() {
   const paletteType = useSelector((state) => state.ui.paletteType);
@@ -29,6 +30,7 @@ function App() {
           </Switch>
         </Container>
         <Snackbar />
+        <SetUsernameDialog />
       </ThemeProvider>
     </React.Fragment>
   );

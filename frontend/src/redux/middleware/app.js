@@ -1,4 +1,4 @@
-import { INIT_APP, INIT_SESSION, initSession } from '../actions/app';
+import { INIT_APP } from '../actions/app';
 import { saveAuthToken, getUser } from '../actions/auth';
 import { goDark, goLight, hideSpinner } from '../actions/ui';
 

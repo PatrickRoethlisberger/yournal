@@ -22,14 +22,18 @@ export const api = ({ dispatch, getState }) => (next) => (action) => {
 
     const requestParam = {
       method,
-      ...(method === 'POST' ? { body: JSON.stringify(action.payload) } : {}),
+      ...(method === 'POST' || method === 'PUT'
+        ? { body: JSON.stringify(action.payload) }
+        : {}),
       headers: {
         ...(state.auth.isLoggedIn
           ? {
               Authorization: `Bearer ${state.auth.token.token}`,
             }
           : {}),
-        ...(method === 'POST' ? { 'Content-Type': 'application/json' } : {}),
+        ...(method === 'POST' || method === 'PUT'
+          ? { 'Content-Type': 'application/json' }
+          : {}),
       },
     };
 

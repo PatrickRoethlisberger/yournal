@@ -7,7 +7,6 @@ import {
 } from '../actions/auth';
 
 const initialState = {
-  user: undefined,
   isLoggedIn: false,
   types: [],
   token: {},
@@ -17,14 +16,12 @@ const initialState = {
 export default function authReducer(state = initialState, action) {
   switch (action.type) {
     case UPDATE_AUTHTYPE:
-      console.log(action);
       return {
         ...state,
         types: action.payload,
       };
 
     case SAVE_AUTHTOKEN:
-      console.log(action);
       return {
         ...state,
         isLoggedIn: true,

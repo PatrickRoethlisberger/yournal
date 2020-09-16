@@ -20,8 +20,7 @@ import {
   GET_POSTS,
   GET_POSTSDATES,
   setPage as _setPage,
-} from '../../redux/actions/post';
-import { showNotification } from '../../redux/actions/ui';
+} from '../../redux/actions/posts';
 import PostItem from './PostItem';
 
 const Home = () => {

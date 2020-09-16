@@ -1,5 +1,10 @@
 import { apiRequest, API_ERROR, API_SUCCESS } from '../actions/api';
-import { getPosts, GET_POSTS, GET_POSTSDATES, SET_PAGE } from '../actions/post';
+import {
+  getPosts,
+  GET_POSTS,
+  GET_POSTSDATES,
+  SET_PAGE,
+} from '../actions/posts';
 import { hideSpinner, showNotification, showSpinner } from '../actions/ui';
 import conf from '../../conf';
 import { getUser } from '../actions/auth';

@@ -1,5 +1,5 @@
 import { API_SUCCESS } from '../actions/api';
-import { GET_POSTS, GET_POSTSDATES, SET_PAGE } from '../actions/post';
+import { GET_POSTS, GET_POSTSDATES, SET_PAGE } from '../actions/posts';
 import moment from 'moment';
 
 const initialState = {

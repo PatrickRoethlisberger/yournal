@@ -3,6 +3,7 @@ export default prefix;
 export const GET_AUTHTYPE = `${prefix} Getting auth type`;
 export const UPDATE_AUTHTYPE = `${prefix} Update auth type with fetched data`;
 export const POST_AUTHPARAMS = `${prefix} Posting parameters recieved by oAuth provider`;
+export const REFRESH_TOKEN = `${prefix} Refreshing auth token`;
 export const SAVE_AUTHTOKEN_LOCALSTORAGE = `${prefix} Saving token into local storage`;
 export const SAVE_AUTHTOKEN = `${prefix} Saving token into state`;
 export const GET_USER = `${prefix} Populate user object`;
@@ -25,6 +26,10 @@ export const postAuthParams = (oAuthState, oAuthCode) => ({
     oAuthState,
     oAuthCode,
   },
+});
+
+export const refreshToken = () => ({
+  type: REFRESH_TOKEN,
 });
 
 export const saveAuthTokenToLocalStorage = (payload) => ({

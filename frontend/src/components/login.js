@@ -27,15 +27,15 @@ const Login = () => {
   const classes = useStyles();
 
   const ShowData = () => {
-    if (authState.isLoggedIn && authState.user.username != '') {
+    if (authState.isLoggedIn && authState.user.username !== '') {
       return <Redirect to={'/'} />;
     } else if (loading) {
       return <CircularProgress />;
     } else if (_.isEmpty(authState.types)) {
       dispatch(getAuthType());
     } else if (
-      oAuthCode != null &&
-      oAuthState != null &&
+      oAuthCode !== null &&
+      oAuthState !== null &&
       !loading &&
       !authState.isLoggedIn
     ) {
@@ -61,7 +61,7 @@ const Login = () => {
       direction="column"
       alignItems="center"
       justify="center"
-      style={{ minHeight: '100vh' }}
+      style={{ minHeight: '100%' }}
     >
       <Grid item xs={3}>
         <Paper className={classes.root}>

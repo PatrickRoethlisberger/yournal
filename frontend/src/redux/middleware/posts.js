@@ -3,11 +3,13 @@ import {
   getPosts,
   GET_POSTS,
   GET_POSTSDATES,
+  SET_FILTER,
   SET_PAGE,
 } from '../actions/posts';
 import { hideSpinner, showNotification, showSpinner } from '../actions/ui';
 import conf from '../../conf';
 import { getUser } from '../actions/auth';
+import moment from 'moment';
 
 export const getPostsFlow = ({ dispatch, getState }) => (next) => (action) => {
   next(action);
@@ -18,10 +20,22 @@ export const getPostsFlow = ({ dispatch, getState }) => (next) => (action) => {
     case GET_POSTS:
       const page = state.posts.currentPage;
       const limit = state.posts.pageSize;
+      const filterState = state.posts.filter;
 
+      // Construct filter
+      let filter = '';
+      if (filterState.category) {
+        filter += `category=${filterState.category}&`;
+      }
+      if (filterState.fromDate) {
+        filter += `pubDateFrom=${moment(filterState.fromDate).format()}&`;
+      }
+      if (filterState.untilDate) {
+        filter += `pubDateTo=${moment(filterState.untilDate).format()}&`;
+      }
       const requestUrl = `${conf.apiRoot}/posts?limit=${limit}&offset=${
         (page - 1) * limit
-      }`;
+      }&${filter}`;
 
       dispatch(
         apiRequest({
@@ -40,7 +54,7 @@ export const getPostsFlow = ({ dispatch, getState }) => (next) => (action) => {
 
     case `${GET_POSTS} ${API_ERROR}`:
       // Most probably failed due to invalid session
-      dispatch(showNotification(getUser()));
+      dispatch(getUser());
       dispatch(hideSpinner({ feature: GET_POSTS }));
       break;
   }
@@ -70,7 +84,7 @@ export const getPostsDatesFlow = ({ dispatch }) => (next) => (action) => {
 
     case `${GET_POSTSDATES} ${API_ERROR}`:
       // Most probably failed due to invalid session
-      dispatch(showNotification(getUser()));
+      dispatch(getUser());
       dispatch(hideSpinner({ feature: GET_POSTSDATES }));
       break;
   }
@@ -86,4 +100,19 @@ export const setPageFlow = ({ dispatch }) => (next) => (action) => {
   }
 };
 
-export const postsMiddleware = [getPostsFlow, getPostsDatesFlow, setPageFlow];
+export const setFilterFlow = ({ dispatch }) => (next) => (action) => {
+  next(action);
+
+  switch (action.type) {
+    case SET_FILTER:
+      dispatch(getPosts());
+      break;
+  }
+};
+
+export const postsMiddleware = [
+  getPostsFlow,
+  getPostsDatesFlow,
+  setPageFlow,
+  setFilterFlow,
+];

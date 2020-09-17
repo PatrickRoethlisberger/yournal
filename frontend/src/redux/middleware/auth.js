@@ -6,6 +6,7 @@ import AUTH, {
   logout,
   GET_AUTHTYPE,
   POST_AUTHPARAMS,
+  REFRESH_TOKEN,
   SAVE_AUTHTOKEN_LOCALSTORAGE,
   GET_USER,
   POST_USERNAME,
@@ -46,6 +47,7 @@ export const getAuthtypeFlow = ({ dispatch }) => (next) => (action) => {
       break;
   }
 };
+
 export const postAuthParamsFlow = ({ dispatch }) => (next) => (action) => {
   next(action);
 
@@ -83,6 +85,33 @@ export const postAuthParamsFlow = ({ dispatch }) => (next) => (action) => {
       break;
   }
 };
+
+export const refreshTokenFlow = ({ dispatch }) => (next) => (action) => {
+  next(action);
+
+  switch (action.type) {
+    case REFRESH_TOKEN:
+      const requestUrl = `${conf.apiRoot}/auth/refresh_token`;
+
+      dispatch(
+        apiRequest({
+          body: null,
+          method: 'GET',
+          url: requestUrl,
+          feature: REFRESH_TOKEN,
+        })
+      );
+      break;
+    case `${REFRESH_TOKEN} ${API_SUCCESS}`:
+      dispatch(saveAuthTokenToLocalStorage(action.payload));
+      break;
+
+    case `${REFRESH_TOKEN} ${API_ERROR}`:
+      dispatch(getUser());
+      break;
+  }
+};
+
 export const saveToLocalStorageFlow = ({ dispatch }) => (next) => (action) => {
   next(action);
 
@@ -178,6 +207,7 @@ export const logoutFlow = () => (next) => (action) => {
 export const authMiddleware = [
   getAuthtypeFlow,
   postAuthParamsFlow,
+  refreshTokenFlow,
   saveToLocalStorageFlow,
   getUserFlow,
   postUsernameFlow,

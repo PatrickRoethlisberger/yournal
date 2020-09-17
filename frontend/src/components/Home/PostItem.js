@@ -9,10 +9,10 @@ import {
 } from '@material-ui/core';
 import React from 'react';
 
-const PostItem = ({ title, category, coverImage, body, slug, pubDate }) => {
+const PostItem = ({ title, category, coverImage, body, url, pubDate }) => {
   const classes = useStyles();
   return (
-    <CardActionArea component="a" href={`/post/${slug}`}>
+    <CardActionArea component="a" href={url}>
       <Card className={classes.card}>
         <div className={classes.cardDetails}>
           <CardContent>

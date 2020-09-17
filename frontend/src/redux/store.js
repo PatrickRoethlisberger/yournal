@@ -7,6 +7,7 @@ import { api } from './middleware/api';
 import { authMiddleware } from './middleware/auth';
 import { appMiddleware } from './middleware/app';
 import { postsMiddleware } from './middleware/posts';
+import { categoriesMiddleware } from './middleware/categories';
 
 import { initApp } from './actions/app';
 
@@ -17,7 +18,8 @@ const store = createStore(
       ...authMiddleware,
       api,
       ...appMiddleware,
-      ...postsMiddleware
+      ...postsMiddleware,
+      ...categoriesMiddleware
     )
   )
 );

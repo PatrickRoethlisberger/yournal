@@ -1,11 +1,20 @@
 import { API_SUCCESS } from '../actions/api';
-import { GET_POSTS, GET_POSTSDATES, SET_PAGE } from '../actions/posts';
+import {
+  GET_POSTS,
+  GET_POSTSDATES,
+  SET_FILTER,
+  SET_PAGE,
+} from '../actions/posts';
 import moment from 'moment';
 
 const initialState = {
   count: null,
   items: [],
-  filter: {},
+  filter: {
+    category: null,
+    fromDate: null,
+    untilDate: null,
+  },
   currentPage: 1,
   pageSize: 10,
   dateCount: {},
@@ -35,6 +44,14 @@ export default function postsReducer(state = initialState, action) {
       return {
         ...state,
         dateCount: counts,
+      };
+    case SET_FILTER:
+      return {
+        ...state,
+        filter: {
+          ...state.filter,
+          ...action.payload,
+        },
       };
     default:
       return state;

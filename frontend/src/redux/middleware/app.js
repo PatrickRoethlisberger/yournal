@@ -10,11 +10,14 @@ export const appInitFlow = ({ dispatch, getState }) => (next) => (action) => {
     // Default: light
     const theme = localStorage.getItem('theme');
     if (
-      theme != 'light' &&
+      theme !== 'light' &&
       matchMedia('(prefers-color-scheme: dark)').matches
     ) {
       dispatch(goDark());
-    } else {
+    } else if (
+      theme !== 'dark' &&
+      matchMedia('(prefers-color-scheme: light)').matches
+    ) {
       dispatch(goLight());
     }
 

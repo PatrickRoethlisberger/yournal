@@ -1,4 +1,3 @@
-import { Alert } from '@material-ui/lab';
 import React, { useState } from 'react';
 import {
   Button,
@@ -8,10 +7,8 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Snackbar,
   TextField,
 } from '@material-ui/core';
-import Slide from '@material-ui/core/Slide';
 import { useDispatch, useSelector } from 'react-redux';
 import { showNotification } from '../redux/actions/ui';
 import { postUsername, POST_USERNAME } from '../redux/actions/auth';
@@ -26,7 +23,7 @@ const SetUsernameDialog = () => {
 
   // Show dialog when a user is logged in but doesn't have username assigned
   const showDialog = () => {
-    if (authState.user.username == '' && authState.isLoggedIn) {
+    if (authState.user.username === '' && authState.isLoggedIn) {
       return true;
     } else {
       return false;
@@ -35,7 +32,7 @@ const SetUsernameDialog = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (username != '') {
+    if (username !== '') {
       dispatch(postUsername(username));
     } else {
       dispatch(

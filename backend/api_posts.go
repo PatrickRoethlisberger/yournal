@@ -91,8 +91,10 @@ func GetPosts(c *gin.Context) {
 	query.limit, _ = c.GetQuery("limit")
 	query.author, _ = c.GetQuery("author")
 	query.offset, _ = c.GetQuery("offset")
-	query.PubDateFrom, _ = c.GetQuery("pubDateFrom")
-	query.PubDateTo, _ = c.GetQuery("pubDateTo")
+	pubDateTotemp, _ := c.GetQuery("pubDateTo")
+	PubDateFromtemp, _ := c.GetQuery("pubDateFrom")
+	query.PubDateFrom, _ = time.Parse(time.RFC3339, PubDateFromtemp)
+	query.PubDateTo, _ = time.Parse(time.RFC3339, pubDateTotemp)
 	query.category, _ = c.GetQuery("category")
 	//Define limit and offset for select statement, user limit = 1000000, offset = 0 as default
 	if query.limit == "" {
@@ -116,12 +118,12 @@ func GetPosts(c *gin.Context) {
 		whereClause = "where (user.oAuthID ='" + oAuthID + "' or post.isPrivate = 0)"
 	}
 	//Expand where clause with information about publication date
-	if query.PubDateFrom != "" && query.PubDateTo != "" {
-		whereClause += " and post.pubDate >= '" + query.PubDateFrom + "' and post.PubDate <= '" + query.PubDateTo + "'"
-	} else if query.PubDateTo != "" {
-		whereClause += " and post.pubDate = '" + query.PubDateTo + "'"
-	} else if query.PubDateFrom != "" {
-		whereClause += " and post.pubDate = '" + query.PubDateFrom + "'"
+	if query.PubDateFrom.IsZero() && query.PubDateTo.IsZero() {
+		whereClause += " and post.pubDate >= '" + query.PubDateFrom.Format(time.RFC3339) + "' and post.PubDate <= '" + query.PubDateTo.Format(time.RFC3339) + "'"
+	} else if query.PubDateTo.IsZero() {
+		whereClause += " and post.pubDate <= '" + query.PubDateTo.Format(time.RFC3339) + "'"
+	} else if query.PubDateFrom.IsZero() {
+		whereClause += " and post.pubDate >= '" + query.PubDateFrom.Format(time.RFC3339) + "'"
 	}
 	//Expand where clause with given category name
 	if query.category != "" {
@@ -134,8 +136,15 @@ func GetPosts(c *gin.Context) {
 		errFeedback = append(errFeedback, err.Error())
 	}
 	defer db.Close()
+	//Preprae statement for getting post count
+	stmtPostsCount, err := db.Prepare("Select count(post.slug) from post join user on user.oAuthID = post.oAuthID join category on category.slug = post.category " + whereClause + ";")
+	if err != nil {
+		errFeedback = append(errFeedback, err.Error())
+	}
+	var rowCount int
+	stmtPostsCount.QueryRow().Scan(&rowCount)
 	//Prepare statement for getting defined posts from database
-	stmtPostsOut, err := db.Prepare("Select post.slug, post.title, category.name, post.coverImage, post.body, post.createdAt,post.updatedAt, post.pubDate, post.isPrivate, user.oAuthID, user.email, user.oAuthType, user.Username, user.Image from post join user on user.oAuthID = post.oAuthID join category on category.slug = post.category " + whereClause + " order by post.updatedAt desc limit ? Offset ?")
+	stmtPostsOut, err := db.Prepare("Select post.slug, post.title, category.name, post.coverImage, post.body, post.createdAt,post.updatedAt, post.pubDate, post.isPrivate, user.oAuthID, user.email, user.oAuthType, user.Username, user.Image from post join user on user.oAuthID = post.oAuthID join category on category.slug = post.category " + whereClause + " order by post.pubDate desc limit ? Offset ?")
 	if err != nil {
 		errFeedback = append(errFeedback, err.Error())
 	}
@@ -143,7 +152,6 @@ func GetPosts(c *gin.Context) {
 	if err != nil {
 		errFeedback = append(errFeedback, err.Error())
 	}
-	var rowCount int = 0
 	//Go through every gotten row and add informations to posts array
 	for rows.Next() {
 		var post Post
@@ -152,7 +160,6 @@ func GetPosts(c *gin.Context) {
 			errFeedback = append(errFeedback, err.Error())
 		}
 		posts = append(posts, post)
-		rowCount++
 	}
 	//Give back cumulated error list
 	if errFeedback != nil {
@@ -219,7 +226,7 @@ func UpdatePost(c *gin.Context) {
 		}
 	}
 	//Update the publication date in database if pubDate is set in request
-	if input.PubDate != "" {
+	if !(input.PubDate.IsZero()) {
 		stmtPostUpdate, err := db.Prepare("update post set pubDate = ? where slug = ? and oAuthID = ?")
 		if err != nil {
 			errFeedback = append(errFeedback, err.Error())
@@ -289,6 +296,9 @@ func CreatePost(c *gin.Context) {
 		errFeedback = append(errFeedback, err.Error())
 	}
 	//Set created at time to now
+	if input.PubDate.IsZero() {
+		input.PubDate = time.Now()
+	}
 	createdAt := time.Now()
 	//Insert given post into database
 	stmtPostCreate, err := db.Prepare("Insert into post (title,category,coverImage,body,oAuthID,createdAt,updatedAt,pubDate,isPrivate) Values (?,(Select slug from category where name = ?),?,?,?,?,?,?,?)")
@@ -298,11 +308,11 @@ func CreatePost(c *gin.Context) {
 	}
 	var post = Post{}
 	//Get back information from created post
-	stmtPostsOut, err := db.Prepare("Select post.slug, post.title, category.name, post.coverImage, post.body, post.createdAt,post.updatedAt, post.pubDate, post.isPrivate, user.oAuthID, user.email, user.oAuthType, user.Username, user.Image from post join user on user.oAuthID = post.oAuthID join category on category.slug = post.category where user.oAuthID = ? and post.title = ? and post.createdAt = ? order by createdAt desc")
+	stmtPostsOut, err := db.Prepare("Select post.slug, post.title, category.name, post.coverImage, post.body, post.createdAt,post.updatedAt, post.pubDate, post.isPrivate, user.oAuthID, user.email, user.oAuthType, user.Username, user.Image from post join user on user.oAuthID = post.oAuthID join category on category.slug = post.category where user.oAuthID = ? and post.title = ? order by createdAt desc limit 1")
 	if err != nil {
 		errFeedback = append(errFeedback, err.Error())
 	}
-	stmtPostsOut.QueryRow(oAuthID, input.Title, createdAt).Scan(&post.Slug, &post.Title, &post.Category, &post.CoverImage, &post.Body, &post.CreatedAt, &post.UpdatedAt, &post.PubDate, &post.IsPrivate, &post.Author.OAuthID, &post.Author.EMail, &post.Author.OAuthType, &post.Author.Username, &post.Author.Image)
+	stmtPostsOut.QueryRow(oAuthID, input.Title).Scan(&post.Slug, &post.Title, &post.Category, &post.CoverImage, &post.Body, &post.CreatedAt, &post.UpdatedAt, &post.PubDate, &post.IsPrivate, &post.Author.OAuthID, &post.Author.EMail, &post.Author.OAuthType, &post.Author.Username, &post.Author.Image)
 	if post.Title == "" {
 		errFeedback = append(errFeedback, "Post not found")
 	}

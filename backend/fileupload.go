@@ -24,7 +24,7 @@ func FileUpload(c *gin.Context) {
 	filename := UniqueFileName(filepath.Ext(file.Filename))
 
 	//localpath defines the local store in which the file is saved
-	localpath := filepath.Join("/var/www/tk/yournal/", filename)
+	localpath := filepath.Join("/var/www/tk/yournal/assets", filename)
 
 	//webpath defines the webaccessible path for the yournal
 	webpath := "assets.yournal.tk/" + filename

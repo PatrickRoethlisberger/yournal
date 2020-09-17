@@ -24,12 +24,12 @@ type Auth struct {
 
 //Query Type defines the input variables for a GET-Query on posts
 type Query struct {
-	author      string `query:"author"`
-	limit       string `query:"limit"`
-	offset      string `query:"offset"`
-	PubDateFrom string `query:"pubDateFrom"`
-	PubDateTo   string `query:"pubDateTo"`
-	category    string `query:"category"`
+	author      string    `query:"author"`
+	limit       string    `query:"limit"`
+	offset      string    `query:"offset"`
+	PubDateFrom time.Time `query:"pubDateFrom"`
+	PubDateTo   time.Time `query:"pubDateTo"`
+	category    string    `query:"category"`
 }
 
 //Route Type for defining different API-Routes
@@ -46,12 +46,12 @@ type Route struct {
 
 //PostInput defines the Type of a Input for Update / Create Post
 type PostInput struct {
-	Title      string `json:"title"`
-	Category   string `json:"category"`
-	CoverImage string `json:"coverImage"`
-	Body       string `json:"body"`
-	IsPrivate  bool   `json:"isPrivate"`
-	PubDate    string `json:"pubDate"`
+	Title      string    `json:"title"`
+	Category   string    `json:"category"`
+	CoverImage string    `json:"coverImage"`
+	Body       string    `json:"body"`
+	IsPrivate  bool      `json:"isPrivate"`
+	PubDate    time.Time `json:"pubDate"`
 }
 
 //Post defines a struct of Items in a Post
@@ -70,7 +70,7 @@ type Post struct {
 
 	UpdatedAt time.Time `json:"updatedAt"`
 
-	PubDate string `json:"pubDate"`
+	PubDate time.Time `json:"pubDate"`
 
 	IsPrivate string `json:"isPrivate"`
 

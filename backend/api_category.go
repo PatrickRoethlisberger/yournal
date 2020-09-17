@@ -139,24 +139,37 @@ func CreateCategory(c *gin.Context) {
 	}
 	defer db.Close()
 	var input CategoryInput
+	var category = Category{}
 	if err := c.ShouldBindJSON(&input); err != nil {
 		errFeedback = append(errFeedback, err.Error())
 	}
-	//Prepare statement for category insert into database
-	stmtPostCreate, err := db.Prepare("Insert into category (name,oauthid) Values (?,?)")
-	_, err = stmtPostCreate.Exec(input.Name, oAuthID)
-	if err != nil {
-		errFeedback = append(errFeedback, err.Error())
-	}
-	var category = Category{}
-	//Get inserted category with slug
-	stmtPostsOut, err := db.Prepare("Select category.slug, category.name from category where category.oAuthID = ? and category.name = ?")
-	if err != nil {
-		errFeedback = append(errFeedback, err.Error())
-	}
-	stmtPostsOut.QueryRow(oAuthID, input.Name).Scan(&category.Slug, &category.Name)
-	if category.Name == "" {
-		errFeedback = append(errFeedback, "Category not found")
+	if input.Name == "" {
+		errFeedback = append(errFeedback, "No name defined")
+	} else {
+		stmtCategoryOut, err := db.Prepare("Select category.slug, category.name from category where category.oAuthID = ? and category.name = ?")
+		if err != nil {
+			errFeedback = append(errFeedback, err.Error())
+		}
+		stmtCategoryOut.QueryRow(oAuthID, input.Name).Scan(&category.Slug, &category.Name)
+		if category.Name != "" {
+			errFeedback = append(errFeedback, "category already exists")
+		} else {
+			//Prepare statement for category insert into database
+			stmtCategoryCreate, err := db.Prepare("Insert into category (name,oauthid) Values (?,?)")
+			_, err = stmtCategoryCreate.Exec(input.Name, oAuthID)
+			if err != nil {
+				errFeedback = append(errFeedback, err.Error())
+			}
+			//Get inserted category with slug
+			stmtCategoryOut, err := db.Prepare("Select category.slug, category.name from category where category.oAuthID = ? and category.name = ?")
+			if err != nil {
+				errFeedback = append(errFeedback, err.Error())
+			}
+			stmtCategoryOut.QueryRow(oAuthID, input.Name).Scan(&category.Slug, &category.Name)
+			if category.Name == "" {
+				errFeedback = append(errFeedback, "Category not found")
+			}
+		}
 	}
 	//Give back cumulated error list
 	if errFeedback != nil {

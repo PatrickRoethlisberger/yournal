@@ -6,6 +6,7 @@ import {
   Button,
   Container,
   Grid,
+  Hidden,
   IconButton,
   Menu,
   MenuItem,
@@ -15,8 +16,10 @@ import { logout } from '../redux/actions/auth';
 import history from '../history';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
+  faBars,
   faBook,
   faMoon,
+  faSignOutAlt,
   faSun,
   faUser,
 } from '@fortawesome/free-solid-svg-icons';
@@ -48,53 +51,78 @@ const MenuBar = () => {
             {isLoggedIn ? (
               <Grid item>
                 <Grid container alignItems="center" spacing={1}>
-                  <Grid item>
-                    <Button
-                      variant="outlined"
-                      onClick={() => history.push('/editor')}
-                    >
-                      Beitrag erstellen
-                    </Button>
-                  </Grid>
-                  <Grid item>
-                    {theme === 'dark' ? (
+                  <Hidden xsDown>
+                    <Grid item>
+                      <Button
+                        variant="outlined"
+                        onClick={() => history.push('/editor')}
+                      >
+                        Beitrag erstellen
+                      </Button>
+                    </Grid>
+                    <Grid item>
+                      {theme === 'dark' ? (
+                        <IconButton
+                          aria-controls="simple-menu"
+                          aria-haspopup="true"
+                          onClick={() => dispatch(goLight())}
+                        >
+                          <FontAwesomeIcon icon={faSun} />
+                        </IconButton>
+                      ) : (
+                        <IconButton
+                          aria-controls="simple-menu"
+                          aria-haspopup="true"
+                          onClick={() => dispatch(goDark())}
+                        >
+                          <FontAwesomeIcon icon={faMoon} />
+                        </IconButton>
+                      )}
+                    </Grid>
+                    <Grid item>
+                      <IconButton
+                        aria-controls="logout"
+                        aria-haspopup="true"
+                        onClick={() => dispatch(logout())}
+                      >
+                        <FontAwesomeIcon icon={faSignOutAlt} />
+                      </IconButton>
+                    </Grid>
+                  </Hidden>
+                  <Hidden smUp>
+                    <Grid item>
                       <IconButton
                         aria-controls="simple-menu"
                         aria-haspopup="true"
-                        onClick={() => dispatch(goLight())}
+                        onClick={(event) => setAnchorEl(event.currentTarget)}
                       >
-                        <FontAwesomeIcon icon={faSun} />
+                        <FontAwesomeIcon icon={faBars} />
                       </IconButton>
-                    ) : (
-                      <IconButton
-                        aria-controls="simple-menu"
-                        aria-haspopup="true"
-                        onClick={() => dispatch(goDark())}
+                      <Menu
+                        id="simple-menu"
+                        anchorEl={anchorEl}
+                        keepMounted
+                        open={Boolean(anchorEl)}
+                        onClose={() => setAnchorEl(null)}
                       >
-                        <FontAwesomeIcon icon={faMoon} />
-                      </IconButton>
-                    )}
-                  </Grid>
-                  <Grid item>
-                    <IconButton
-                      aria-controls="simple-menu"
-                      aria-haspopup="true"
-                      onClick={(event) => setAnchorEl(event.currentTarget)}
-                    >
-                      <FontAwesomeIcon icon={faUser} />
-                    </IconButton>
-                    <Menu
-                      id="simple-menu"
-                      anchorEl={anchorEl}
-                      keepMounted
-                      open={Boolean(anchorEl)}
-                      onClose={() => setAnchorEl(null)}
-                    >
-                      <MenuItem onClick={() => dispatch(logout())}>
-                        Logout
-                      </MenuItem>
-                    </Menu>
-                  </Grid>
+                        <MenuItem onClick={() => history.push('/editor')}>
+                          Beitrag erstellen
+                        </MenuItem>
+                        {theme === 'dark' ? (
+                          <MenuItem onClick={() => dispatch(goLight())}>
+                            Light-Theme
+                          </MenuItem>
+                        ) : (
+                          <MenuItem onClick={() => dispatch(goDark())}>
+                            Dark-Theme
+                          </MenuItem>
+                        )}
+                        <MenuItem onClick={() => dispatch(logout())}>
+                          Logout
+                        </MenuItem>
+                      </Menu>
+                    </Grid>
+                  </Hidden>
                 </Grid>
               </Grid>
             ) : (

@@ -9,6 +9,7 @@ import {
   Typography,
 } from '@material-ui/core';
 import React from 'react';
+import _ from 'lodash';
 
 const PostItem = ({ title, category, coverImage, body, url, pubDate }) => {
   const classes = useStyles();
@@ -20,9 +21,15 @@ const PostItem = ({ title, category, coverImage, body, url, pubDate }) => {
             <Typography component="h2" variant="h5">
               {title}
             </Typography>
-            <Typography variant="subtitle1" color="textSecondary">
-              {pubDate} in <Chip style={{ float: 'rigth' }} label={category} />
-            </Typography>
+            {!_.isEmpty(category) ? (
+              <Typography variant="subtitle1" color="textSecondary">
+                {pubDate} in{' '}
+                <Chip style={{ float: 'rigth' }} label={category} />
+              </Typography>
+            ) : (
+              ''
+            )}
+
             <Typography variant="subtitle1" paragraph>
               {body}
             </Typography>
@@ -42,6 +49,7 @@ const PostItem = ({ title, category, coverImage, body, url, pubDate }) => {
 const useStyles = makeStyles({
   card: {
     display: 'flex',
+    width: '100%',
   },
   cardDetails: {
     flex: 1,

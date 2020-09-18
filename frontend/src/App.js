@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 import MenuBar from './components/MenuBar';
 import Home from './components/Home';
@@ -6,7 +6,7 @@ import Login from './components/Login';
 import Post from './components/Post';
 import Editor from './components/Editor';
 import Snackbar from './components/Snackbar';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import {
   ThemeProvider,
   Container,
@@ -36,7 +36,8 @@ function App() {
             <Route exact path={'/'} component={Home} />
             <Route path={'/login'} component={Login} />
             <Route path={'/post/:slug'} component={Post} />
-            <Route path={'/editor'} component={Editor} />
+            <Route exact path={'/editor'} component={Editor} />
+            <Route path={'/editor/:slug'} component={Editor} />
             <Redirect to={'/'} />
           </Switch>
         </Container>

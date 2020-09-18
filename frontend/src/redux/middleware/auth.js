@@ -45,6 +45,8 @@ export const getAuthtypeFlow = ({ dispatch }) => (next) => (action) => {
       dispatch(showNotification('error', 'Login aktuell nicht möglich 🔥'));
       dispatch(hideSpinner({ feature: AUTH }));
       break;
+    default:
+      break;
   }
 };
 
@@ -83,6 +85,8 @@ export const postAuthParamsFlow = ({ dispatch }) => (next) => (action) => {
       );
       history.push('/login');
       break;
+    default:
+      break;
   }
 };
 
@@ -109,6 +113,8 @@ export const refreshTokenFlow = ({ dispatch }) => (next) => (action) => {
     case `${REFRESH_TOKEN} ${API_ERROR}`:
       dispatch(getUser());
       break;
+    default:
+      break;
   }
 };
 
@@ -120,6 +126,8 @@ export const saveToLocalStorageFlow = ({ dispatch }) => (next) => (action) => {
       localStorage.setItem('jwt', JSON.stringify({ ...action.payload }));
       dispatch(saveAuthToken(action.payload));
       dispatch(getUser());
+      break;
+    default:
       break;
   }
 };
@@ -152,6 +160,8 @@ export const getUserFlow = ({ dispatch }) => (next) => (action) => {
         )
       );
       history.push('/login');
+      break;
+    default:
       break;
   }
 };
@@ -190,6 +200,8 @@ export const postUsernameFlow = ({ dispatch }) => (next) => (action) => {
         )
       );
       break;
+    default:
+      break;
   }
 };
 
@@ -200,6 +212,8 @@ export const logoutFlow = () => (next) => (action) => {
     case LOGOUT:
       localStorage.removeItem('jwt');
       history.push('/login');
+      break;
+    default:
       break;
   }
 };

@@ -21,9 +21,13 @@ export const api = ({ dispatch, getState }) => (next) => (action) => {
     const state = getState();
 
     const requestParam = {
-      method,
+      ...(method === 'FILE' ? { method: 'POST' } : { method }),
       ...(method === 'POST' || method === 'PUT'
         ? { body: JSON.stringify(action.payload) }
+        : method === 'FILE'
+        ? {
+            body: action.payload,
+          }
         : {}),
       headers: {
         ...(state.auth.isLoggedIn

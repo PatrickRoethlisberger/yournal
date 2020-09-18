@@ -3,6 +3,7 @@ import {
   CardActionArea,
   CardContent,
   CardMedia,
+  Chip,
   Hidden,
   makeStyles,
   Typography,
@@ -20,13 +21,13 @@ const PostItem = ({ title, category, coverImage, body, url, pubDate }) => {
               {title}
             </Typography>
             <Typography variant="subtitle1" color="textSecondary">
-              {pubDate}
+              {pubDate} in <Chip style={{ float: 'rigth' }} label={category} />
             </Typography>
             <Typography variant="subtitle1" paragraph>
               {body}
             </Typography>
             <Typography variant="subtitle1" color="primary">
-              Zum Eintrag...
+              Zum Eintrag
             </Typography>
           </CardContent>
         </div>

@@ -1,6 +1,10 @@
 import { hideSpinner, showSpinner } from '../actions/ui';
 import conf from '../../conf';
-import { GET_CATEGORIES } from '../actions/categories';
+import {
+  CREATE_CATEGORY,
+  getCategories,
+  GET_CATEGORIES,
+} from '../actions/categories';
 import { apiRequest, API_ERROR, API_SUCCESS } from '../actions/api';
 
 export const getCategoriesFlow = ({ dispatch }) => (next) => (action) => {
@@ -28,7 +32,44 @@ export const getCategoriesFlow = ({ dispatch }) => (next) => (action) => {
     case `${GET_CATEGORIES} ${API_ERROR}`:
       dispatch(hideSpinner({ feature: GET_CATEGORIES }));
       break;
+    default:
+      break;
   }
 };
 
-export const categoriesMiddleware = [getCategoriesFlow];
+export const createCategoryFlow = ({ dispatch }) => (next) => (action) => {
+  next(action);
+
+  switch (action.type) {
+    case CREATE_CATEGORY:
+      const requestUrl = `${conf.apiRoot}/category`;
+
+      const param = {
+        name: action.payload,
+      };
+
+      dispatch(
+        apiRequest({
+          body: param,
+          method: 'POST',
+          url: requestUrl,
+          feature: CREATE_CATEGORY,
+        })
+      );
+      dispatch(getCategories());
+      dispatch(showSpinner({ feature: CREATE_CATEGORY }));
+      break;
+
+    case `${CREATE_CATEGORY} ${API_SUCCESS}`:
+      dispatch(hideSpinner({ feature: CREATE_CATEGORY }));
+      break;
+
+    case `${CREATE_CATEGORY} ${API_ERROR}`:
+      dispatch(hideSpinner({ feature: CREATE_CATEGORY }));
+      break;
+    default:
+      break;
+  }
+};
+
+export const categoriesMiddleware = [getCategoriesFlow, createCategoryFlow];

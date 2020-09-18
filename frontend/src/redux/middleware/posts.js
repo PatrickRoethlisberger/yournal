@@ -6,7 +6,7 @@ import {
   SET_FILTER,
   SET_PAGE,
 } from '../actions/posts';
-import { hideSpinner, showNotification, showSpinner } from '../actions/ui';
+import { hideSpinner, showSpinner } from '../actions/ui';
 import conf from '../../conf';
 import { getUser } from '../actions/auth';
 import moment from 'moment';
@@ -28,10 +28,15 @@ export const getPostsFlow = ({ dispatch, getState }) => (next) => (action) => {
         filter += `category=${filterState.category}&`;
       }
       if (filterState.fromDate) {
-        filter += `pubDateFrom=${moment(filterState.fromDate).format()}&`;
+        // Subtract one day so posts on set day get displayed
+        filter += `pubDateFrom=${moment(filterState.fromDate)
+          .subtract(1, 'days')
+          .format('YYYY-MM-DD[T]hh:mm:ss[Z]')}&`;
       }
       if (filterState.untilDate) {
-        filter += `pubDateTo=${moment(filterState.untilDate).format()}&`;
+        filter += `pubDateTo=${moment(filterState.untilDate).format(
+          'YYYY-MM-DD[T]hh:mm:ss[Z]'
+        )}&`;
       }
       const requestUrl = `${conf.apiRoot}/posts?limit=${limit}&offset=${
         (page - 1) * limit
@@ -56,6 +61,8 @@ export const getPostsFlow = ({ dispatch, getState }) => (next) => (action) => {
       // Most probably failed due to invalid session
       dispatch(getUser());
       dispatch(hideSpinner({ feature: GET_POSTS }));
+      break;
+    default:
       break;
   }
 };
@@ -87,6 +94,8 @@ export const getPostsDatesFlow = ({ dispatch }) => (next) => (action) => {
       dispatch(getUser());
       dispatch(hideSpinner({ feature: GET_POSTSDATES }));
       break;
+    default:
+      break;
   }
 };
 
@@ -97,6 +106,8 @@ export const setPageFlow = ({ dispatch }) => (next) => (action) => {
     case SET_PAGE:
       dispatch(getPosts());
       break;
+    default:
+      break;
   }
 };
 
@@ -106,6 +117,8 @@ export const setFilterFlow = ({ dispatch }) => (next) => (action) => {
   switch (action.type) {
     case SET_FILTER:
       dispatch(getPosts());
+      break;
+    default:
       break;
   }
 };

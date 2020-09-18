@@ -120,6 +120,7 @@ const Filter = () => {
             }}
           />
           <Button
+            variant="contained"
             onClick={() => {
               dispatch(
                 setFilter({ category: null, fromDate: null, untilDate: null })

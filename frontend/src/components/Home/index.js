@@ -6,7 +6,7 @@ import {
   makeStyles,
   Typography,
 } from '@material-ui/core';
-import { Autocomplete, Pagination } from '@material-ui/lab';
+import { Pagination } from '@material-ui/lab';
 import moment from 'moment';
 import React from 'react';
 import _ from 'lodash';
@@ -54,7 +54,7 @@ const Home = () => {
     if (_.isEmpty(categoriesState.items)) {
       dispatch(getCategories());
     }
-  }, []);
+  }, [dispatch, postsState.dateCount, categoriesState.items]);
 
   return (
     <main>
@@ -67,6 +67,7 @@ const Home = () => {
       >
         <Grid item sm={12} md={4}>
           <Grid container direction="column" spacing={3}>
+            <Grid item />
             {!_.isEmpty(postsState.dateCount) && !statsLoading ? (
               <Grid item>
                 <Card className={classes.card}>
@@ -78,6 +79,7 @@ const Home = () => {
                       <CircularProgress />
                     ) : (
                       <Calendar
+                        panelColors={panelColors}
                         values={postsState.dateCount}
                         until={moment().format('YYYY-MM-DD')}
                       />
@@ -86,7 +88,7 @@ const Home = () => {
                 </Card>
               </Grid>
             ) : (
-              <Grid item />
+              ''
             )}
             {!_.isEmpty(categoriesState.items) && !categoriesLoading ? (
               <Filter />
@@ -101,6 +103,7 @@ const Home = () => {
             <CircularProgress />
           ) : postsState.count ? (
             <Grid container direction="column" spacing={3}>
+              <Grid item />
               {postsState.items.map((el, i) => {
                 return (
                   <Grid item key={i}>
@@ -109,7 +112,9 @@ const Home = () => {
                       category={el.category}
                       coverImage={el.coverImage}
                       url={`post/${el.slug}`}
-                      pubDate={moment(new Date(el.pubDate)).fromNow()}
+                      pubDate={moment(new Date(el.pubDate)).format(
+                        'DD.MM.YYYY'
+                      )}
                     />
                   </Grid>
                 );
@@ -160,5 +165,7 @@ const useStyles = makeStyles(() => ({
     width: '100%',
   },
 }));
+
+var panelColors = ['#e8f5e9', '#a5d6a7', '#66bb6a', '#43a047', '#2e7d32'];
 
 export default AuthenticatedComponent(Home);

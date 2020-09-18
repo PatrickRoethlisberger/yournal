@@ -8,6 +8,8 @@ import { authMiddleware } from './middleware/auth';
 import { appMiddleware } from './middleware/app';
 import { postsMiddleware } from './middleware/posts';
 import { categoriesMiddleware } from './middleware/categories';
+import { editorMiddleware } from './middleware/editor';
+import { postMiddleware } from './middleware/post';
 
 import { initApp } from './actions/app';
 
@@ -18,8 +20,10 @@ const store = createStore(
       ...authMiddleware,
       api,
       ...appMiddleware,
+      ...postMiddleware,
       ...postsMiddleware,
-      ...categoriesMiddleware
+      ...categoriesMiddleware,
+      ...editorMiddleware
     )
   )
 );

@@ -11,9 +11,9 @@ import {
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import AuthenticatedComponent from '../../helpers/AuthenticatedComponent';
-import { getPost } from '../../redux/actions/post';
+import { deletePost, getPost } from '../../redux/actions/post';
 import moment from 'moment';
-import { faPen } from '@fortawesome/free-solid-svg-icons';
+import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import history from '../../history';
 
@@ -68,7 +68,7 @@ const Post = (props) => {
         <Typography variant="body1" gutterBottom>
           {postState.body}
         </Typography>
-        <Grid container>
+        <Grid container direction="row" spacing={2}>
           <Grid item>
             <Button
               variant="outlined"
@@ -78,6 +78,17 @@ const Post = (props) => {
               startIcon={<FontAwesomeIcon icon={faPen} />}
             >
               Beitrag bearbeiten
+            </Button>
+          </Grid>
+          <Grid item>
+            <Button
+              variant="outlined"
+              aria-controls="simple-menu"
+              aria-haspopup="true"
+              onClick={() => dispatch(deletePost(postState.slug))}
+              startIcon={<FontAwesomeIcon icon={faTrash} />}
+            >
+              Beitrag löschen
             </Button>
           </Grid>
         </Grid>

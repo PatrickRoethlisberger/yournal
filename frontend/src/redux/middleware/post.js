@@ -1,6 +1,11 @@
 import { hideSpinner, showNotification, showSpinner } from '../actions/ui';
 import conf from '../../conf';
-import { GET_POST, PUBLISH_POST, UPADTE_POST } from '../actions/post';
+import {
+  DELETE_POST,
+  GET_POST,
+  PUBLISH_POST,
+  UPADTE_POST,
+} from '../actions/post';
 import { apiRequest, API_ERROR, API_SUCCESS } from '../actions/api';
 import moment from 'moment';
 import history from '../../history';
@@ -126,4 +131,39 @@ export const getPostFlow = ({ dispatch }) => (next) => (action) => {
   }
 };
 
-export const postMiddleware = [publishPostFlow, updatePostFlow, getPostFlow];
+export const deletePostFlow = ({ dispatch }) => (next) => (action) => {
+  next(action);
+
+  switch (action.type) {
+    case DELETE_POST:
+      const requestUrl = `${conf.apiRoot}/posts/${action.payload}`;
+
+      dispatch(
+        apiRequest({
+          body: null,
+          method: 'DELETE',
+          url: requestUrl,
+          feature: DELETE_POST,
+        })
+      );
+      break;
+
+    case `${DELETE_POST} ${API_SUCCESS}`:
+    case `${DELETE_POST} ${API_ERROR}`:
+      dispatch(
+        showNotification('success', 'Beitrag wurde erfolgreich gelöscht 🗑')
+      );
+      dispatch(getPostDates());
+      history.push('/');
+      break;
+    default:
+      break;
+  }
+};
+
+export const postMiddleware = [
+  publishPostFlow,
+  updatePostFlow,
+  getPostFlow,
+  deletePostFlow,
+];

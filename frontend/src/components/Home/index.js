@@ -3,6 +3,7 @@ import {
   CardContent,
   CircularProgress,
   Grid,
+  Hidden,
   makeStyles,
   Typography,
 } from '@material-ui/core';
@@ -97,13 +98,15 @@ const Home = () => {
             )}
           </Grid>
         </Grid>
-        <Grid item sm={12} md={8}>
+        <Grid item sm={12} md={8} style={{ width: '100%' }}>
           {/* Display loading when count is null */}
           {postsLoading[GET_POSTS] ? (
             <CircularProgress />
           ) : postsState.count ? (
             <Grid container direction="column" spacing={3}>
-              <Grid item />
+              <Hidden smDown>
+                <Grid item />
+              </Hidden>
               {postsState.items.map((el, i) => {
                 return (
                   <Grid item key={i}>

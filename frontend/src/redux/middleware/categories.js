@@ -6,6 +6,7 @@ import {
   GET_CATEGORIES,
 } from '../actions/categories';
 import { apiRequest, API_ERROR, API_SUCCESS } from '../actions/api';
+import { updatePostProp } from '../actions/post';
 
 export const getCategoriesFlow = ({ dispatch }) => (next) => (action) => {
   next(action);
@@ -56,12 +57,17 @@ export const createCategoryFlow = ({ dispatch }) => (next) => (action) => {
           feature: CREATE_CATEGORY,
         })
       );
-      dispatch(getCategories());
       dispatch(showSpinner({ feature: CREATE_CATEGORY }));
       break;
 
     case `${CREATE_CATEGORY} ${API_SUCCESS}`:
       dispatch(hideSpinner({ feature: CREATE_CATEGORY }));
+      console.log(action.payload);
+      dispatch(
+        updatePostProp({
+          ...action.payload,
+        })
+      );
       break;
 
     case `${CREATE_CATEGORY} ${API_ERROR}`:

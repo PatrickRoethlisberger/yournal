@@ -121,19 +121,12 @@ const Editor = (props) => {
                         value={postState.category}
                         onChange={(event, newValue) => {
                           if (typeof newValue === 'string') {
-                            dispatch(
-                              updatePostProp({
-                                category: newValue,
-                              })
-                            );
+                            // Create a new category directly by clicking enter
+                            dispatch(createCategory(newValue));
                           } else if (newValue && newValue.inputValue) {
-                            // Create a new value from the user input
+                            // Create a new category from the user input
+                            console.log('select');
                             dispatch(createCategory(newValue.inputValue));
-                            dispatch(
-                              updatePostProp({
-                                category: { name: newValue.inputValue },
-                              })
-                            );
                           } else {
                             dispatch(
                               updatePostProp({

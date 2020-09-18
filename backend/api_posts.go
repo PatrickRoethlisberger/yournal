@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -92,9 +93,14 @@ func GetPosts(c *gin.Context) {
 	query.author, _ = c.GetQuery("author")
 	query.offset, _ = c.GetQuery("offset")
 	pubDateTotemp, _ := c.GetQuery("pubDateTo")
-	PubDateFromtemp, _ := c.GetQuery("pubDateFrom")
-	query.PubDateFrom, _ = time.Parse(time.RFC3339, PubDateFromtemp)
+	pubDateFromtemp, _ := c.GetQuery("pubDateFrom")
+	query.PubDateFrom, err = time.Parse(time.RFC3339, pubDateFromtemp)
+	fmt.Println(err)
 	query.PubDateTo, _ = time.Parse(time.RFC3339, pubDateTotemp)
+	fmt.Println(pubDateFromtemp)
+	fmt.Println(pubDateTotemp)
+	fmt.Println(query.PubDateFrom)
+	fmt.Println(query.PubDateTo)
 	query.category, _ = c.GetQuery("category")
 	//Define limit and offset for select statement, user limit = 1000000, offset = 0 as default
 	if query.limit == "" {
@@ -115,14 +121,14 @@ func GetPosts(c *gin.Context) {
 			whereClause = "where (user.username ='" + query.author + "' and post.isPrivate = 0)"
 		}
 	} else {
-		whereClause = "where (user.oAuthID ='" + oAuthID + "' or post.isPrivate = 0)"
+		whereClause = "where (user.oAuthID ='" + oAuthID + "')"
 	}
 	//Expand where clause with information about publication date
-	if query.PubDateFrom.IsZero() && query.PubDateTo.IsZero() {
+	if pubDateTotemp != "" && pubDateFromtemp != "" {
 		whereClause += " and post.pubDate >= '" + query.PubDateFrom.Format(time.RFC3339) + "' and post.PubDate <= '" + query.PubDateTo.Format(time.RFC3339) + "'"
-	} else if query.PubDateTo.IsZero() {
+	} else if pubDateTotemp != "" {
 		whereClause += " and post.pubDate <= '" + query.PubDateTo.Format(time.RFC3339) + "'"
-	} else if query.PubDateFrom.IsZero() {
+	} else if pubDateFromtemp != "" {
 		whereClause += " and post.pubDate >= '" + query.PubDateFrom.Format(time.RFC3339) + "'"
 	}
 	//Expand where clause with given category name
@@ -205,7 +211,7 @@ func UpdatePost(c *gin.Context) {
 	}
 	//Update the category in database if category is set in request
 	if input.Category != "" {
-		stmtPostUpdate, err := db.Prepare("update post set category = (select id from category where name = ?) where slug = ? and oAuthID = ?")
+		stmtPostUpdate, err := db.Prepare("update post set category = (select slug from category where name = ?) where slug = ? and oAuthID = ?")
 		if err != nil {
 			errFeedback = append(errFeedback, err.Error())
 		}

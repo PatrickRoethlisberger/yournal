@@ -55,7 +55,7 @@ const Home = () => {
     if (_.isEmpty(categoriesState.items)) {
       dispatch(getCategories());
     }
-  }, [dispatch, postsState.dateCount, categoriesState.items]);
+  }, []);
 
   return (
     <main>

@@ -26,7 +26,7 @@ const Post = (props) => {
   const slug = props.match.params.slug;
   React.useEffect(() => {
     dispatch(getPost(slug));
-  }, [dispatch, slug]);
+  }, []);
   return (
     <Card className={classes.card}>
       <CardContent className={classes.filterContent}>

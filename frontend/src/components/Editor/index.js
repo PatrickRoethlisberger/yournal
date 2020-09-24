@@ -44,7 +44,7 @@ const Editor = (props) => {
     } else {
       dispatch(clearPost());
     }
-  }, [dispatch, categoriesState.items, slug]);
+  }, []);
 
   const handleImageUpload = (e) => {
     dispatch(postImage(e.target.files[0]));
